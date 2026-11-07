@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://takoubakoy90.github.io/takoubakoy-lab/sitemap.xml
