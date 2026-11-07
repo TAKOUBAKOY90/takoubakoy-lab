@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="TAKOUBAKOY LAB — Projets, expérimentations et réalisations numériques. Concevoir, tester et construire des solutions maîtrisées.">
+
+  <meta name="theme-color" content="#080b12">
+
+  <title>Projets — TAKOUBAKOY LAB</title>
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <a href="../index.html" class="brand" aria-label="TAKOUBAKOY LAB - Accueil">
+      <img
+        src="../assets/images/takoubakoy-lab-logo.svg"
+        alt="TAKOUBAKOY LAB — Digital Independence"
+        class="brand-logo">
+    </a>
+
+    <nav class="site-nav" aria-label="Navigation principale">
+      <a href="../index.html">Accueil</a>
+      <a href="../systemes/">Systèmes</a>
+      <a href="../securite/">Sécurité</a>
+      <a href="../outils-solutions/">Outils & Solutions</a>
+      <a href="#realisations">Projets</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-content">
+        <span class="eyebrow">04 — CONSTRUIRE ET EXPÉRIMENTER</span>
+
+        <h1>
+          Concevoir.<br>
+          <span>Expérimenter.</span><br>
+          Construire.
+        </h1>
+
+        <p>
+          L'indépendance numérique se construit par la pratique.
+          Explorer des idées, tester des technologies et développer
+          des solutions concrètes permet de transformer les
+          connaissances en réalisations.
+        </p>
+
+        <a href="#realisations" class="btn">
+          Découvrir les projets →
+        </a>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true"></div>
+    </section>
+
+    <section class="content-section" id="realisations">
+      <div class="section-heading">
+        <span class="eyebrow">PROJETS ET RÉALISATIONS</span>
+        <h2>Donner forme aux idées</h2>
+        <p>
+          Découvrir les projets développés au laboratoire,
+          leurs objectifs, leurs architectures et leurs résultats.
+        </p>
+      </div>
+
+      <div class="card-grid">
+
+        <article class="info-card">
+          <span class="card-number">01.01</span>
+          <h3>Développement web</h3>
+          <p>
+            Création de sites web, interfaces numériques,
+            architectures front-end et solutions accessibles.
+          </p>
+        </article>
+
+        <article class="info-card">
+          <span class="card-number">01.02</span>
+          <h3>Applications numériques</h3>
+          <p>
+            Conception d'applications, prototypes fonctionnels,
+            outils pratiques et expérimentations mobiles.
+          </p>
+        </article>
+
+        <article class="info-card">
+          <span class="card-number">01.03</span>
+          <h3>Intelligence artificielle</h3>
+          <p>
+            Expérimentation de modèles d'IA, assistants locaux,
+            automatisation et systèmes intelligents.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-heading">
+        <span class="eyebrow">LABORATOIRE TECHNIQUE</span>
+        <h2>Explorer par l'expérimentation</h2>
+        <p>
+          Tester des configurations, étudier des technologies
+          et comprendre les mécanismes avant de déployer une solution.
+        </p>
+      </div>
+
+      <div class="card-grid">
+
+        <article class="info-card">
+          <span class="card-number">02.01</span>
+          <h3>Environnements de test</h3>
+          <p>
+            Machines virtuelles, systèmes de test,
+            configurations expérimentales et validation technique.
+          </p>
+        </article>
+
+        <article class="info-card">
+          <span class="card-number">02.02</span>
+          <h3>Infrastructure & réseaux</h3>
+          <p>
+            Étude des architectures réseau, services,
+            serveurs et solutions d'hébergement.
+          </p>
+        </article>
+
+        <article class="info-card">
+          <span class="card-number">02.03</span>
+          <h3>Sécurité expérimentale</h3>
+          <p>
+            Analyse des mécanismes de protection,
+            tests contrôlés et vérification des configurations.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="method-card">
+        <span class="eyebrow">MÉTHODE DU LABORATOIRE</span>
+        <h3>Concevoir. Tester. Documenter.</h3>
+        <p>
+          Chaque projet suit une démarche structurée :
+          définir un objectif, identifier les ressources,
+          construire une première version, tester les résultats
+          et documenter les enseignements.
+          Une réalisation doit être compréhensible,
+          vérifiable et reproductible.
+        </p>
+      </div>
+    </section>
+
+    <section class="closing-section">
+      <span class="eyebrow">DE L'IDÉE À LA RÉALISATION</span>
+      <h2>Construire pour comprendre. Comprendre pour être autonome.</h2>
+      <p>
+        Le laboratoire transforme les connaissances en expériences
+        concrètes et les expériences en solutions maîtrisées.
+      </p>
+
+      <a href="../index.html" class="btn">
+        Retour aux domaines du LAB →
+      </a>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <h3>TAKOUBAKOY LAB</h3>
+    <p>Digital Independence</p>
+    <small>© 2026 TAKOUBAKOY LAB — Tous droits réservés.</small>
+  </footer>
+
+</body>
+</html>
