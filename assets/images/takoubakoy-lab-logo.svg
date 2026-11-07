@@ -1,0 +1,36 @@
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 720 180"
+     width="720"
+     height="180">
+
+  <title>TAKOUBAKOY LAB — Digital Independence</title>
+  <desc>Logo horizontal officiel de TAKOUBAKOY LAB.</desc>
+
+  <g transform="translate(12, -8) scale(0.65)">
+    <g fill="#ED3548">
+      <rect x="36" y="42" width="184" height="24"/>
+      <rect x="116" y="42" width="24" height="110"/>
+    </g>
+
+    <g fill="#2788F5">
+      <rect x="116" y="128" width="24" height="86"/>
+      <rect x="116" y="190" width="104" height="24"/>
+    </g>
+  </g>
+
+  <text x="190" y="91"
+        fill="#F2F5FA"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="43"
+        font-weight="800"
+        letter-spacing="1">TAKOUBAKOY LAB</text>
+
+  <text x="193" y="125"
+        fill="#2788F5"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="17"
+        font-weight="700"
+        letter-spacing="5">DIGITAL INDEPENDENCE</text>
+
+</svg>
