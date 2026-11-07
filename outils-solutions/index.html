@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="TAKOUBAKOY LAB — Explorer les logiciels, l'intelligence artificielle, les applications et les solutions numériques.">
+
+  <meta name="theme-color" content="#080b12">
+
+  <title>Outils & Solutions — TAKOUBAKOY LAB</title>
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+  <link rel="stylesheet" href="../assets/css/style.css">
+
+  <style>
+    .tools-hero {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 110px 24px 100px;
+    }
+
+    .tools-label {
+      color: var(--accent-blue);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .tools-hero h1 {
+      max-width: 800px;
+      margin: 28px 0;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+
+    .tools-hero h1 span {
+      color: var(--accent-red);
+    }
+
+    .tools-hero p {
+      max-width: 680px;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .tools-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+    }
+
+    .tools-nav a {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: color 0.2s ease;
+    }
+
+    .tools-nav a:hover {
+      color: var(--accent-blue);
+    }
+
+    .tools-section {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 75px 24px;
+    }
+
+    .tools-section h2 {
+      margin: 18px 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+    }
+
+    .tools-intro {
+      max-width: 720px;
+      margin-bottom: 42px;
+      color: var(--text-muted);
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .tools-card {
+      min-height: 225px;
+      padding: 30px 26px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      transition: transform 0.25s ease,
+                  border-color 0.25s ease,
+                  background 0.25s ease;
+    }
+
+    .tools-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(39, 136, 245, 0.5);
+      background: #1c2638;
+    }
+
+    .tools-number {
+      display: block;
+      margin-bottom: 28px;
+      color: var(--accent-red);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    .tools-card h3 {
+      margin-bottom: 14px;
+      font-size: 1.2rem;
+    }
+
+    .tools-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .tools-method {
+      max-width: 1120px;
+      margin: 60px auto 100px;
+      padding: 42px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--accent-red);
+      border-radius: 16px;
+    }
+
+    .tools-method h3 {
+      margin: 20px 0 14px;
+      font-size: 1.5rem;
+    }
+
+    .tools-method p {
+      color: var(--text-muted);
+    }
+
+    .tools-conclusion {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 50px 24px 110px;
+    }
+
+    .tools-conclusion h2 {
+      max-width: 750px;
+      margin: 20px 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.15;
+    }
+
+    .tools-conclusion p {
+      max-width: 700px;
+      color: var(--text-muted);
+    }
+
+    .tools-button {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 15px 22px;
+      border: 1px solid var(--accent-blue);
+      border-radius: 7px;
+      background: var(--bg-secondary);
+      font-weight: 700;
+      transition: background 0.2s ease;
+    }
+
+    .tools-button:hover {
+      background: #1c2638;
+    }
+
+    @media (max-width: 760px) {
+      .tools-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .tools-nav {
+        gap: 16px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tools-hero {
+        padding: 75px 20px;
+      }
+
+      .tools-section {
+        padding: 55px 20px;
+      }
+
+      .tools-method {
+        margin: 40px 20px 70px;
+        padding: 28px 22px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tools-card,
+      .tools-nav a,
+      .tools-button {
+        transition: none;
+      }
+
+      .tools-card:hover {
+        transform: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <a href="../index.html" class="brand"
+       aria-label="TAKOUBAKOY LAB - Accueil">
+      <img
+        src="../assets/images/takoubakoy-lab-logo.svg"
+        alt="TAKOUBAKOY LAB — Digital Independence"
+        class="brand-logo">
+    </a>
+
+    <nav class="tools-nav" aria-label="Navigation des outils">
+      <a href="../index.html">Accueil</a>
+      <a href="#logiciels">Logiciels</a>
+      <a href="#intelligence-artificielle">Intelligence artificielle</a>
+      <a href="#applications">Applications</a>
+      <a href="#solutions">Solutions</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="tools-hero">
+      <span class="tools-label">
+        03 — Explorer les technologies
+      </span>
+
+      <h1>
+        Choisir.<br>
+        <span>Comprendre.</span><br>
+        Maîtriser.
+      </h1>
+
+      <p>
+        Les outils numériques façonnent notre environnement.
+        Comprendre leur fonctionnement, leurs possibilités et
+        leurs limites permet de choisir des solutions adaptées
+        à ses besoins et de conserver le contrôle.
+      </p>
+    </section>
+
+    <section class="tools-section" id="logiciels">
+      <span class="tools-label">Environnements numériques</span>
+
+      <h2>Logiciels & outils</h2>
+
+      <p class="tools-intro">
+        Découvrir les logiciels, comprendre leurs fonctions,
+        comparer les solutions et apprendre à les utiliser
+        avec discernement.
+      </p>
+
+      <div class="tools-grid">
+
+        <article class="tools-card">
+          <span class="tools-number">01.01</span>
+          <h3>Logiciels système</h3>
+          <p>
+            Outils de configuration, administration,
+            maintenance et gestion des ressources informatiques.
+          </p>
+        </article>
+
+        <article class="tools-card">
+          <span class="tools-number">01.02</span>
+          <h3>Logiciels libres</h3>
+          <p>
+            Solutions open source, licences, transparence
+            du code et maîtrise des environnements logiciels.
+          </p>
+        </article>
+
+        <article class="tools-card">
+          <span class="tools-number">01.03</span>
+          <h3>Outils professionnels</h3>
+          <p>
+            Productivité, bureautique, création, gestion
+            et organisation du travail numérique.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="tools-section" id="intelligence-artificielle">
+      <span class="tools-label">Technologies intelligentes</span>
+
+      <h2>Intelligence artificielle</h2>
+
+      <p class="tools-intro">
+        Comprendre les modèles d'IA, leurs capacités,
+        leurs limites et les différentes possibilités
+        d'utilisation, en ligne ou en local.
+      </p>
+
+      <div class="tools-grid">
+
+        <article class="tools-card">
+          <span class="tools-number">02.01</span>
+          <h3>Modèles d'IA</h3>
+          <p>
+            Modèles de langage, génération de contenu,
+            fonctionnement et principes fondamentaux.
+          </p>
+        </article>
+
+        <article class="tools-card">
+          <span class="tools-number">02.02</span>
+          <h3>IA locale</h3>
+          <p>
+            Exécution sur ordinateur, modèles locaux,
+            ressources matérielles et confidentialité.
+          </p>
+        </article>
+
+        <article class="tools-card">
+          <span class="tools-number">02.03</span>
+          <h3>Automatisation intelligente</h3>
+          <p>
+            Agents, assistants, traitement des tâches
+            et intégration de l'intelligence artificielle.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="tools-section" id="applications">
+      <span class="tools-label">Usages et développement</span>
+
+      <h2>Applications & plateformes</h2>
+
+      <p class="tools-intro">
+        Explorer les applications, comprendre leur architecture
+        et découvrir comment elles répondent aux besoins réels.
+      </p>
+
+      <div class="tools-grid">
+
+        <article class="tools-card">
+          <span class="tools-number">03.01</span>
+          <h3>Applications mobiles</h3>
+          <p>
+            Android, architecture applicative, permissions,
+            installation et gestion des applications.
+          </p>
+        </article>
+
+        <article class="tools-card">
+          <span class="tools-number">03.02</span>
+          <h3>Applications web</h3>
+          <p>
+            Sites web, interfaces, services en ligne,
+            fonctionnement et technologies du Web.
+          </p>
+        </article>
+
+        <article class="tools-card">
+          <span class="tools-number">03.03</span>
+          <h3>Développement</h3>
+          <p>
+            Langages de programmation, environnements,
+            frameworks et conception de solutions.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="tools-section" id="solutions">
+      <span class="tools-label">Indépendance technologique</span>
+
+      <h2>Solutions numériques</h2>
+
+      <p class="tools-intro">
+        Identifier les besoins, évaluer les alternatives
+        et construire des environnements numériques
+        plus adaptés, maîtrisés et durables.
+      </p>
+
+      <div class="tools-grid">
+
+        <article class="tools-card">
+          <span class="tools-number">04.01</span>
+          <h3>Alternatives numériques</h3>
+          <p>
+            Comparaison des services, solutions indépendantes
+            et réduction des dépendances inutiles.
+          </p>
+        </article>
+
+        <article class="tools-card">
+          <span class="tools-number">04.02</span>
+          <h3>Interopérabilité</h3>
+          <p>
+            Formats ouverts, compatibilité, échanges
+            de données et portabilité des informations.
+          </p>
+        </article>
+
+        <article class="tools-card">
+          <span class="tools-number">04.03</span>
+          <h3>Écosystèmes numériques</h3>
+          <p>
+            Organisation des outils, intégration des services
+            et maîtrise de son environnement technologique.
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="tools-method">
+      <span class="tools-label">Méthode du laboratoire</span>
+
+      <h3>Évaluer. Comparer. Choisir.</h3>
+
+      <p>
+        Un outil ne doit pas être choisi uniquement pour sa
+        popularité. Le laboratoire examine son fonctionnement,
+        sa sécurité, sa fiabilité, son coût, sa transparence
+        et le contrôle laissé à l'utilisateur.
+      </p>
+    </section>
+
+    <section class="tools-conclusion">
+      <span class="tools-label">La technologie au service de l'autonomie</span>
+
+      <h2>Le meilleur outil est celui que l'on comprend et maîtrise.</h2>
+
+      <p>
+        L'indépendance numérique ne consiste pas à utiliser
+        toutes les technologies, mais à savoir lesquelles
+        choisir, pourquoi les utiliser et comment en garder
+        le contrôle.
+      </p>
+
+      <a href="../index.html#domaines" class="tools-button">
+        Retour aux domaines du LAB →
+      </a>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <h3>TAKOUBAKOY LAB</h3>
+    <p>Digital Independence</p>
+    <p>© 2026 TAKOUBAKOY LAB — Tous droits réservés.</p>
+  </footer>
+
+</body>
+</html>
