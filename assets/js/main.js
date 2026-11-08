@@ -1,8 +1,7 @@
-
 /* ========================================
    TAKOUBAKOY LAB — JavaScript principal
    Digital Independence
-   Version : 1.0.0
+   Version : 1.1.0
 ======================================== */
 
 (() => {
@@ -10,11 +9,15 @@
 
   /**
    * Point d'entrée des fonctionnalités globales.
-   * Les modules indépendants seront intégrés ici.
    */
   const init = () => {
     // Activation du marqueur JavaScript.
     document.documentElement.classList.add("js");
+
+    // Vérification de la disponibilité du diagnostic navigateur.
+    if (typeof window.TAKOUBAKOY?.getBrowserInfo === "function") {
+      document.documentElement.classList.add("browser-info-ready");
+    }
   };
 
   // Initialisation après le chargement du document.
