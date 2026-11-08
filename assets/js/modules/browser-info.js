@@ -2,7 +2,7 @@
 /* ========================================
    TAKOUBAKOY LAB — Browser Info
    Module : Diagnostic navigateur
-   Version : 1.1.0
+   Version : 1.2.0
 ======================================== */
 
 (() => {
@@ -53,6 +53,42 @@
     return result;
   };
 
+  const getNetworkInfo = () => {
+    const connection =
+      navigator.connection ||
+      navigator.mozConnection ||
+      navigator.webkitConnection;
+
+    if (!connection) {
+      return {
+        available: false,
+        type: "Non disponible",
+        effectiveType: "Non disponible",
+        downlink: "Non disponible",
+        rtt: "Non disponible",
+        saveData: "Non disponible"
+      };
+    }
+
+    return {
+      available: true,
+      type: connection.type || "Non communiqué",
+      effectiveType: connection.effectiveType || "Non disponible",
+      downlink:
+        typeof connection.downlink === "number"
+          ? connection.downlink
+          : "Non disponible",
+      rtt:
+        typeof connection.rtt === "number"
+          ? connection.rtt
+          : "Non disponible",
+      saveData:
+        typeof connection.saveData === "boolean"
+          ? connection.saveData
+          : "Non disponible"
+    };
+  };
+
   const getBrowserInfo = () => {
     const nav = window.navigator;
     const screenInfo = window.screen;
@@ -72,7 +108,8 @@
       memory: nav.deviceMemory || "Non disponible",
       cores: nav.hardwareConcurrency || "Non disponible",
 
-      graphics: getGraphicsInfo()
+      graphics: getGraphicsInfo(),
+      network: getNetworkInfo()
     };
   };
 
