@@ -221,6 +221,63 @@
                 L'historique sera conservé uniquement dans ce navigateur.
               </p>
             </div>
+                             
+            <div class="network-dashboard">
+
+              <h4>Tableau de bord réseau</h4>
+
+              <div class="network-statistics">
+
+                <p>
+                  Dernier débit :
+                  <strong id="diag-speed-latest">Non disponible</strong>
+                </p>
+
+                <p>
+                  Débit moyen :
+                  <strong id="diag-speed-average">Non disponible</strong>
+                </p>
+
+                <p>
+                  Meilleur débit :
+                  <strong id="diag-speed-best">Non disponible</strong>
+                </p>
+
+              </div>
+
+              <div class="network-chart">
+                <h4>Évolution du débit</h4>
+
+                <canvas
+                  id="diag-speed-chart"
+                  width="600"
+                  height="220"
+                  role="img"
+                  aria-label="Graphique de l'évolution des débits mesurés">
+                  Graphique des débits mesurés.
+                </canvas>
+              </div>
+
+              <div class="network-chart">
+                <h4>Évolution de la latence HTTP</h4>
+
+                <canvas
+                  id="diag-latency-chart"
+                  width="600"
+                  height="220"
+                  role="img"
+                  aria-label="Graphique de l'évolution de la latence HTTP">
+                  Graphique des latences HTTP mesurées.
+                </canvas>
+              </div>
+
+              <p class="network-dashboard-note">
+                Les graphiques utilisent les mesures conservées
+                localement dans ce navigateur.
+              </p>
+
+            </div>
+
 
 
           </div>
