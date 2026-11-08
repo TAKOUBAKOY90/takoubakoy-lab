@@ -2,7 +2,7 @@
 /* ========================================
    TAKOUBAKOY LAB — System Diagnostic
    Module : Diagnostic environnement
- Version : 1.7.0
+   Version : 1.7.0
 ======================================== */
 
 (() => {
@@ -14,10 +14,10 @@
     if (typeof getInfo !== "function") return;
 
     const HISTORY_KEY = "takoubakoy_speed_history";
-    const MAX_HISTORY = 3;
-     
     const LATENCY_HISTORY_KEY = "takoubakoy_latency_history";
+    const MAX_HISTORY = 3;
 
+    // Lecture sécurisée de l'historique des latences.
     const readLatencyHistory = () => {
       try {
         const stored = localStorage.getItem(LATENCY_HISTORY_KEY);
@@ -36,6 +36,7 @@
       }
     };
 
+    // Affichage des graphiques Canvas.
     const drawChart = (canvasId, values, unit, color) => {
       const canvas = document.getElementById(canvasId);
       if (!canvas) return;
@@ -46,6 +47,7 @@
       const width = canvas.width;
       const height = canvas.height;
       const padding = 42;
+      const rightPadding = 100;
 
       context.clearRect(0, 0, width, height);
       context.font = "13px Arial";
@@ -53,32 +55,57 @@
       context.strokeStyle = "#344054";
       context.lineWidth = 1;
 
+      // Axes du graphique.
       context.beginPath();
       context.moveTo(padding, 15);
       context.lineTo(padding, height - padding);
-      context.lineTo(width - 12, height - padding);
+      context.lineTo(width - rightPadding, height - padding);
       context.stroke();
 
       if (values.length === 0) {
-        context.fillText("Aucune mesure disponible", padding + 10, height / 2);
+        context.fillText(
+          "Aucune mesure disponible",
+          padding + 10,
+          height / 2
+        );
         return;
       }
 
-      const maximum = Math.max(...values.map(item => item.value), 1);
-      const minimum = Math.min(...values.map(item => item.value), 0);
-      const range = Math.max(maximum - minimum, maximum * 0.15, 1);
+      const maximum = Math.max(
+        ...values.map(item => item.value),
+        1
+      );
+
+      const minimum = Math.min(
+        ...values.map(item => item.value),
+        0
+      );
+
+      const range = Math.max(
+        maximum - minimum,
+        maximum * 0.15,
+        1
+      );
+
+      const chartWidth = width - padding - rightPadding;
 
       const points = values.map((item, index) => {
         const x = values.length === 1
-          ? width / 2
-          : padding + index * (width - padding - 24) / (values.length - 1);
+          ? padding + chartWidth / 2
+          : padding + index * chartWidth / (values.length - 1);
 
         const y = height - padding -
-          ((item.value - minimum) / range) * (height - padding - 35);
+          ((item.value - minimum) / range) *
+          (height - padding - 35);
 
-        return { x, y, value: item.value };
+        return {
+          x,
+          y,
+          value: item.value
+        };
       });
 
+      // Tracé de la courbe.
       context.strokeStyle = color;
       context.lineWidth = 3;
       context.beginPath();
@@ -93,6 +120,7 @@
 
       context.stroke();
 
+      // Points et libellés.
       points.forEach((point, index) => {
         context.fillStyle = color;
         context.beginPath();
@@ -100,9 +128,17 @@
         context.fill();
 
         context.fillStyle = "#f2f5fa";
+
+        const label = `${point.value.toFixed(1)} ${unit}`;
+        const labelWidth = context.measureText(label).width;
+
+        const labelX = point.x + labelWidth + 14 > width - 8
+          ? point.x - labelWidth - 8
+          : point.x + 7;
+
         context.fillText(
-          `${point.value.toFixed(1)} ${unit}`,
-          Math.min(point.x + 7, width - 110),
+          label,
+          Math.max(4, labelX),
           Math.max(point.y - 12, 15)
         );
 
@@ -115,18 +151,33 @@
       });
     };
 
+    // Mise à jour du tableau de bord réseau.
     const renderNetworkDashboard = () => {
       const speeds = readSpeedHistory();
       const latencies = readLatencyHistory();
 
       if (speeds.length > 0) {
         const values = speeds.map(item => item.speed);
-        const average = values.reduce((sum, value) => sum + value, 0) /
-          values.length;
 
-        setValue("diag-speed-latest", `${values[0].toFixed(2)} Mbit/s`);
-        setValue("diag-speed-average", `${average.toFixed(2)} Mbit/s`);
-        setValue("diag-speed-best", `${Math.max(...values).toFixed(2)} Mbit/s`);
+        const average = values.reduce(
+          (sum, value) => sum + value,
+          0
+        ) / values.length;
+
+        setValue(
+          "diag-speed-latest",
+          `${values[0].toFixed(2)} Mbit/s`
+        );
+
+        setValue(
+          "diag-speed-average",
+          `${average.toFixed(2)} Mbit/s`
+        );
+
+        setValue(
+          "diag-speed-best",
+          `${Math.max(...values).toFixed(2)} Mbit/s`
+        );
       } else {
         setValue("diag-speed-latest", "Non disponible");
         setValue("diag-speed-average", "Non disponible");
@@ -135,19 +186,24 @@
 
       drawChart(
         "diag-speed-chart",
-        speeds.slice().reverse().map(item => ({ value: item.speed })),
+        speeds.slice().reverse().map(item => ({
+          value: item.speed
+        })),
         "Mbit/s",
         "#2788f5"
       );
 
       drawChart(
         "diag-latency-chart",
-        latencies.slice().reverse().map(item => ({ value: item.latency })),
+        latencies.slice().reverse().map(item => ({
+          value: item.latency
+        })),
         "ms",
         "#ed3548"
       );
     };
 
+    // Enregistrement de l'historique des latences.
     const saveLatencyHistory = latency => {
       try {
         const history = readLatencyHistory();
@@ -168,24 +224,34 @@
       renderNetworkDashboard();
     };
 
-
+    // Mise à jour sécurisée d'un élément HTML.
     const setValue = (id, value) => {
       const element = document.getElementById(id);
-      if (element) element.textContent = String(value);
+
+      if (element) {
+        element.textContent = String(value);
+      }
     };
 
-    const getBrowserName = (userAgent) => {
+    // Identification du navigateur.
+    const getBrowserName = userAgent => {
       if (/Edg\//.test(userAgent)) return "Microsoft Edge";
       if (/Firefox\//.test(userAgent)) return "Mozilla Firefox";
       if (/Chrome\//.test(userAgent)) return "Google Chrome";
       if (/Safari\//.test(userAgent)) return "Apple Safari";
+
       return "Navigateur non identifié";
     };
 
+    // Actualisation des informations système.
     const updateDiagnostic = () => {
       const info = getInfo();
 
-      setValue("diag-user-agent", getBrowserName(info.userAgent));
+      setValue(
+        "diag-user-agent",
+        getBrowserName(info.userAgent)
+      );
+
       setValue("diag-platform", info.platform);
       setValue("diag-language", info.language);
       setValue("diag-cores", info.cores);
@@ -202,13 +268,27 @@
         `${info.screen.width} × ${info.screen.height} pixels`
       );
 
-      setValue("diag-pixel-ratio", `${info.screen.pixelRatio}x`);
-      setValue("diag-online", info.online ? "Connecté" : "Hors ligne");
+      setValue(
+        "diag-pixel-ratio",
+        `${info.screen.pixelRatio}x`
+      );
+
+      setValue(
+        "diag-online",
+        info.online ? "Connecté" : "Hors ligne"
+      );
 
       const network = info.network;
 
-      setValue("diag-network-type", network?.type || "Non disponible");
-      setValue("diag-network-profile", network?.effectiveType || "Non disponible");
+      setValue(
+        "diag-network-type",
+        network?.type || "Non disponible"
+      );
+
+      setValue(
+        "diag-network-profile",
+        network?.effectiveType || "Non disponible"
+      );
 
       setValue(
         "diag-network-downlink",
@@ -240,19 +320,28 @@
           : "Non disponible"
       );
 
-      setValue("diag-gpu-vendor", graphics?.vendor || "Non disponible");
-      setValue("diag-gpu-renderer", graphics?.renderer || "Non disponible");
+      setValue(
+        "diag-gpu-vendor",
+        graphics?.vendor || "Non disponible"
+      );
+
+      setValue(
+        "diag-gpu-renderer",
+        graphics?.renderer || "Non disponible"
+      );
 
       setValue(
         "diag-last-update",
         `Dernière actualisation : ${new Date().toLocaleString("fr-FR")}`
       );
 
-      document.documentElement.classList.add("system-diagnostic-ready");
+      document.documentElement.classList.add(
+        "system-diagnostic-ready"
+      );
     };
 
     // Évaluation indicative du débit.
-    const getSpeedQuality = (speed) => {
+    const getSpeedQuality = speed => {
       if (speed < 5) {
         return "Connexion limitée";
       }
@@ -264,7 +353,7 @@
       return "Connexion rapide";
     };
 
-    // Lecture sécurisée de l'historique local.
+    // Lecture sécurisée de l'historique des débits.
     const readSpeedHistory = () => {
       try {
         const stored = localStorage.getItem(HISTORY_KEY);
@@ -284,12 +373,13 @@
       }
     };
 
-    // Affichage de l'historique.
+    // Affichage de l'historique des tests de débit.
     const renderSpeedHistory = () => {
       const list = document.getElementById("diag-speed-history");
       if (!list) return;
 
       const history = readSpeedHistory();
+
       list.replaceChildren();
 
       if (history.length === 0) {
@@ -312,7 +402,7 @@
       });
     };
 
-    // Enregistrement d'un résultat.
+    // Enregistrement d'un résultat de débit.
     const saveSpeedHistory = (speed, bytes) => {
       try {
         const history = readSpeedHistory();
@@ -329,8 +419,11 @@
         );
 
         renderSpeedHistory();
+        renderNetworkDashboard();
       } catch (error) {
-        const status = document.getElementById("diag-speed-status");
+        const status = document.getElementById(
+          "diag-speed-status"
+        );
 
         if (status) {
           status.textContent +=
@@ -341,28 +434,45 @@
 
     // Test de latence HTTP.
     const runHttpLatencyTest = async () => {
-      const resultElement = document.getElementById("diag-http-latency");
-      const statusElement = document.getElementById("diag-http-status");
-      const testButton = document.getElementById("diag-http-test");
+      const resultElement = document.getElementById(
+        "diag-http-latency"
+      );
+
+      const statusElement = document.getElementById(
+        "diag-http-status"
+      );
+
+      const testButton = document.getElementById(
+        "diag-http-test"
+      );
 
       if (!resultElement || !statusElement || !testButton) return;
 
       if (!navigator.onLine) {
         resultElement.textContent = "Indisponible";
-        statusElement.textContent = "Aucune connexion Internet détectée.";
+        statusElement.textContent =
+          "Aucune connexion Internet détectée.";
         return;
       }
 
       testButton.disabled = true;
       resultElement.textContent = "Mesure en cours...";
-      statusElement.textContent = "Exécution de trois requêtes HTTP.";
+      statusElement.textContent =
+        "Exécution de trois requêtes HTTP.";
 
       const samples = [];
-      const target = new URL("../assets/images/favicon.svg", document.baseURI);
+
+      const target = new URL(
+        "../assets/images/favicon.svg",
+        document.baseURI
+      );
 
       try {
         for (let i = 0; i < 3; i += 1) {
-          target.searchParams.set("diagnostic", `${Date.now()}-${i}`);
+          target.searchParams.set(
+            "diagnostic",
+            `${Date.now()}-${i}`
+          );
 
           const start = performance.now();
 
@@ -373,23 +483,31 @@
           });
 
           if (!response.ok) {
-            throw new Error(`Réponse HTTP ${response.status}`);
+            throw new Error(
+              `Réponse HTTP ${response.status}`
+            );
           }
 
           await response.body?.cancel();
+
           samples.push(performance.now() - start);
         }
 
-        const average =
-          samples.reduce((total, value) => total + value, 0) /
-          samples.length;
+        const average = samples.reduce(
+          (total, value) => total + value,
+          0
+        ) / samples.length;
 
-        resultElement.textContent = `${Math.round(average)} ms`;
-         saveLatencyHistory(average);
+        resultElement.textContent =
+          `${Math.round(average)} ms`;
+
+        saveLatencyHistory(average);
+
         statusElement.textContent =
           "Moyenne de trois requêtes HTTP vers le serveur TAKOUBAKOY LAB.";
       } catch (error) {
         resultElement.textContent = "Échec du test";
+
         statusElement.textContent =
           "Impossible de mesurer la latence HTTP. Vérifiez la connexion et réessayez.";
       } finally {
@@ -399,26 +517,44 @@
 
     // Test de débit avec limite de téléchargement.
     const runSpeedTest = async () => {
-      const consent = document.getElementById("diag-speed-consent");
-      const button = document.getElementById("diag-speed-test");
-      const result = document.getElementById("diag-speed-result");
-      const status = document.getElementById("diag-speed-status");
-      const quality = document.getElementById("diag-speed-quality");
+      const consent = document.getElementById(
+        "diag-speed-consent"
+      );
+
+      const button = document.getElementById(
+        "diag-speed-test"
+      );
+
+      const result = document.getElementById(
+        "diag-speed-result"
+      );
+
+      const status = document.getElementById(
+        "diag-speed-status"
+      );
+
+      const quality = document.getElementById(
+        "diag-speed-quality"
+      );
 
       if (!consent || !button || !result || !status) return;
 
       if (!consent.checked) {
-        status.textContent = "Autorisation nécessaire avant le test.";
+        status.textContent =
+          "Autorisation nécessaire avant le test.";
         return;
       }
 
       if (!navigator.onLine) {
         result.textContent = "Indisponible";
-        status.textContent = "Aucune connexion Internet détectée.";
+
+        status.textContent =
+          "Aucune connexion Internet détectée.";
         return;
       }
 
       const maxBytes = 1000000;
+
       const target = new URL(
         "../assets/images/og-takoubakoy-lab.png",
         document.baseURI
@@ -428,8 +564,11 @@
 
       button.disabled = true;
       consent.disabled = true;
+
       result.textContent = "Mesure en cours...";
-      status.textContent = "Téléchargement du fichier de test...";
+
+      status.textContent =
+        "Téléchargement du fichier de test...";
 
       if (quality) {
         quality.textContent = "Évaluation en cours...";
@@ -446,15 +585,24 @@
         });
 
         if (!response.ok) {
-          throw new Error(`Réponse HTTP ${response.status}`);
+          throw new Error(
+            `Réponse HTTP ${response.status}`
+          );
         }
 
-        if (new URL(response.url).origin !== window.location.origin) {
-          throw new Error("Origine du téléchargement non autorisée.");
+        if (
+          new URL(response.url).origin !==
+          window.location.origin
+        ) {
+          throw new Error(
+            "Origine du téléchargement non autorisée."
+          );
         }
 
         if (!response.body) {
-          throw new Error("Flux de téléchargement indisponible.");
+          throw new Error(
+            "Flux de téléchargement indisponible."
+          );
         }
 
         const reader = response.body.getReader();
@@ -468,11 +616,15 @@
 
           if (transferred > maxBytes) {
             await reader.cancel();
-            throw new Error("Limite de téléchargement dépassée.");
+
+            throw new Error(
+              "Limite de téléchargement dépassée."
+            );
           }
         }
 
-        const duration = (performance.now() - start) / 1000;
+        const duration =
+          (performance.now() - start) / 1000;
 
         if (transferred === 0 || duration <= 0) {
           throw new Error("Mesure invalide.");
@@ -481,21 +633,27 @@
         const megabitsPerSecond =
           (transferred * 8) / duration / 1000000;
 
-        result.textContent = `${megabitsPerSecond.toFixed(2)} Mbit/s`;
+        result.textContent =
+          `${megabitsPerSecond.toFixed(2)} Mbit/s`;
 
         status.textContent =
           `Test terminé : ${(transferred / 1000000).toFixed(3)} Mo transférés en ${duration.toFixed(2)} secondes.`;
 
         if (quality) {
-          quality.textContent = getSpeedQuality(megabitsPerSecond);
+          quality.textContent =
+            getSpeedQuality(megabitsPerSecond);
         }
 
-        saveSpeedHistory(megabitsPerSecond, transferred);
+        saveSpeedHistory(
+          megabitsPerSecond,
+          transferred
+        );
       } catch (error) {
         result.textContent = "Échec du test";
 
         if (quality) {
-          quality.textContent = "Évaluation indisponible.";
+          quality.textContent =
+            "Évaluation indisponible.";
         }
 
         status.textContent =
@@ -506,18 +664,38 @@
       }
     };
 
-    const refreshButton = document.getElementById("diag-refresh");
+    // Actualisation manuelle du diagnostic.
+    const refreshButton = document.getElementById(
+      "diag-refresh"
+    );
+
     if (refreshButton) {
-      refreshButton.addEventListener("click", updateDiagnostic);
+      refreshButton.addEventListener(
+        "click",
+        updateDiagnostic
+      );
     }
 
-    const httpTestButton = document.getElementById("diag-http-test");
+    // Activation du test HTTP.
+    const httpTestButton = document.getElementById(
+      "diag-http-test"
+    );
+
     if (httpTestButton) {
-      httpTestButton.addEventListener("click", runHttpLatencyTest);
+      httpTestButton.addEventListener(
+        "click",
+        runHttpLatencyTest
+      );
     }
 
-    const speedConsent = document.getElementById("diag-speed-consent");
-    const speedButton = document.getElementById("diag-speed-test");
+    // Gestion du consentement pour le test de débit.
+    const speedConsent = document.getElementById(
+      "diag-speed-consent"
+    );
+
+    const speedButton = document.getElementById(
+      "diag-speed-test"
+    );
 
     if (speedConsent && speedButton) {
       speedButton.disabled = !speedConsent.checked;
@@ -526,36 +704,43 @@
         speedButton.disabled = !speedConsent.checked;
       });
 
-      speedButton.addEventListener("click", runSpeedTest);
+      speedButton.addEventListener(
+        "click",
+        runSpeedTest
+      );
     }
 
-    const clearHistoryButton =
-      document.getElementById("diag-speed-history-clear");
+    // Effacement des historiques locaux.
+    const clearHistoryButton = document.getElementById(
+      "diag-speed-history-clear"
+    );
 
     if (clearHistoryButton) {
       clearHistoryButton.addEventListener("click", () => {
         try {
           localStorage.removeItem(HISTORY_KEY);
-localStorage.removeItem(LATENCY_HISTORY_KEY);
+          localStorage.removeItem(LATENCY_HISTORY_KEY);
         } catch (error) {
           // Le stockage local peut être désactivé.
         }
 
-       renderSpeedHistory();
-         renderNetworkDashboard();
-         renderNetworkDashboard();
+        renderSpeedHistory();
+        renderNetworkDashboard();
       });
     }
 
+    // Initialisation du diagnostic.
     updateDiagnostic();
     renderSpeedHistory();
-     renderNetworkDashboard();
+    renderNetworkDashboard();
   };
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initSystemDiagnostic, {
-      once: true
-    });
+    document.addEventListener(
+      "DOMContentLoaded",
+      initSystemDiagnostic,
+      { once: true }
+    );
   } else {
     initSystemDiagnostic();
   }
