@@ -1,1 +1,429 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Fiche technique de l'expérimentation 01 de TAKOUBAKOY LAB : conception, méthode de test et résultats du diagnostic système.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#080b12">
+
+  <link rel="canonical" href="https://takoubakoy90.github.io/takoubakoy-lab/laboratoire/experimentations/diagnostic-systeme.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Expérimentation 01 — Diagnostic système">
+  <meta property="og:description" content="Documentation technique du développement et de la validation de l'outil Diagnostic système.">
+  <meta property="og:site_name" content="TAKOUBAKOY LAB">
+  <meta property="og:locale" content="fr_FR">
+
+  <title>Expérimentation 01 — Diagnostic système | TAKOUBAKOY LAB</title>
+
+  <link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+
+<body>
+
+  <!-- EN-TÊTE -->
+  <header class="site-header">
+
+    <a href="../../index.html" class="brand"
+       aria-label="TAKOUBAKOY LAB - Accueil">
+
+      <img
+        src="../../assets/images/takoubakoy-lab-logo.svg"
+        alt="TAKOUBAKOY LAB — Digital Independence"
+        class="brand-logo">
+
+    </a>
+
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a href="../../index.html">Accueil</a>
+      <a href="../../systemes/">Systèmes</a>
+      <a href="../../securite/">Sécurité</a>
+      <a href="../../outils-solutions/">Outils & Solutions</a>
+      <a href="../../projets/">Projets</a>
+      <a href="../../ressources/">Ressources</a>
+      <a href="../">Laboratoire</a>
+    </nav>
+
+  </header>
+
+  <main>
+
+    <!-- INTRODUCTION -->
+    <section class="hero">
+
+      <p class="eyebrow">EXPÉRIMENTATION 01 — FICHE TECHNIQUE</p>
+
+      <h1>
+        Diagnostic.<br>
+        <span>Mesurer.</span><br>
+        Documenter.
+      </h1>
+
+      <p class="hero-description">
+        Étude technique d'un outil de diagnostic permettant
+        d'observer les informations système accessibles
+        depuis un navigateur web et de réaliser des tests
+        de connexion réseau.
+      </p>
+
+      <a href="../../diagnostic/" class="primary-link">
+        Accéder à l'outil de diagnostic
+        <span aria-hidden="true">→</span>
+      </a>
+
+    </section>
+
+    <!-- OBJECTIF -->
+    <section class="content-section">
+
+      <div class="section-heading">
+
+        <p class="eyebrow">01 — OBJECTIF</p>
+
+        <h2>Présentation de l'expérimentation</h2>
+
+        <p>
+          Cette expérimentation consiste à développer un outil
+          web capable de collecter et de présenter les informations
+          techniques exposées par le navigateur, puis de mesurer
+          certains paramètres de la connexion réseau.
+        </p>
+
+      </div>
+
+      <div class="project-panel">
+
+        <span class="project-status">OBJECTIF TECHNIQUE</span>
+
+        <h3>Observer un environnement numérique</h3>
+
+        <p>
+          L'objectif est de proposer une interface de diagnostic
+          accessible, sans installation de logiciel supplémentaire,
+          pour mieux comprendre les caractéristiques disponibles
+          d'un environnement informatique.
+        </p>
+
+      </div>
+
+    </section>
+
+    <!-- ENVIRONNEMENT -->
+    <section class="content-section">
+
+      <div class="section-heading">
+
+        <p class="eyebrow">02 — ENVIRONNEMENT DE TEST</p>
+
+        <h2>Configuration utilisée</h2>
+
+        <p>
+          La validation fonctionnelle a été réalisée depuis
+          un ordinateur portable sous Windows 11, avec
+          Microsoft Edge.
+        </p>
+
+      </div>
+
+      <div class="domain-grid">
+
+        <article class="domain-card">
+          <span class="card-number">ENVIRONNEMENT 01</span>
+          <h3>Système</h3>
+          <p>Windows 11</p>
+          <p>Microsoft Edge</p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">ENVIRONNEMENT 02</span>
+          <h3>Processeur et mémoire</h3>
+          <p>32 processeurs logiques exposés au navigateur.</p>
+          <p>32 Go de mémoire estimée exposée.</p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">ENVIRONNEMENT 03</span>
+          <h3>Graphisme</h3>
+          <p>NVIDIA GeForce RTX 5060 Laptop GPU.</p>
+          <p>WebGL 2.0 disponible.</p>
+        </article>
+
+      </div>
+
+      <p>
+        <strong>Précision :</strong> les informations relatives
+        au nombre de processeurs logiques et à la mémoire sont
+        celles exposées par le navigateur. Elles ne constituent
+        pas une mesure exhaustive des ressources réellement
+        disponibles pour le système.
+      </p>
+
+    </section>
+
+    <!-- MÉTHODOLOGIE -->
+    <section class="content-section">
+
+      <div class="section-heading">
+
+        <p class="eyebrow">03 — MÉTHODOLOGIE</p>
+
+        <h2>Procédure de validation</h2>
+
+        <p>
+          Les essais ont été organisés autour de plusieurs
+          fonctions indépendantes de l'outil.
+        </p>
+
+      </div>
+
+      <div class="domain-grid">
+
+        <article class="domain-card">
+          <span class="card-number">TEST 01</span>
+          <h3>Informations système</h3>
+          <p>
+            Vérification des informations accessibles concernant
+            le navigateur, la plateforme, le processeur logique,
+            la mémoire estimée et l'affichage.
+          </p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">TEST 02</span>
+          <h3>Capacités graphiques</h3>
+          <p>
+            Vérification de la disponibilité de WebGL 2.0
+            et des informations graphiques accessibles.
+          </p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">TEST 03</span>
+          <h3>Latence HTTP</h3>
+          <p>
+            Exécution de requêtes HTTP successives vers
+            une ressource du site, avec mesure du temps
+            de réponse à l'aide de l'API Performance.
+          </p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">TEST 04</span>
+          <h3>Débit réseau</h3>
+          <p>
+            Téléchargement volontaire d'un échantillon
+            de données pouvant atteindre environ 1 Mo,
+            avec mesure du débit descendant.
+          </p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">TEST 05</span>
+          <h3>Historique et export</h3>
+          <p>
+            Vérification de l'enregistrement local des mesures,
+            de leur affichage dans l'interface et de l'export
+            d'un rapport de diagnostic.
+          </p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">TEST 06</span>
+          <h3>Gestion des données</h3>
+          <p>
+            Vérification de la suppression de l'historique
+            et de son absence après actualisation de la page.
+          </p>
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- RÉSULTATS -->
+    <section class="content-section">
+
+      <div class="section-heading">
+
+        <p class="eyebrow">04 — RÉSULTATS OBSERVÉS</p>
+
+        <h2>Mesures de la session de validation</h2>
+
+        <p>
+          Les valeurs ci-dessous correspondent à une session
+          de test réalisée avec l'outil. Elles décrivent
+          les observations de cette session et ne constituent
+          pas des performances garanties.
+        </p>
+
+      </div>
+
+      <div class="domain-grid">
+
+        <article class="domain-card">
+          <span class="card-number">RÉSULTAT 01</span>
+          <h3>Latence HTTP</h3>
+          <p>Première mesure observée : environ 53 ms.</p>
+          <p>Seconde mesure observée : environ 99 ms.</p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">RÉSULTAT 02</span>
+          <h3>Débit descendant</h3>
+          <p>Mesure 1 : 15,38 Mbit/s.</p>
+          <p>Mesure 2 : 4,46 Mbit/s.</p>
+          <p>Mesure 3 : 18,39 Mbit/s.</p>
+          <p>Moyenne observée : 12,74 Mbit/s.</p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">RÉSULTAT 03</span>
+          <h3>Informations réseau</h3>
+          <p>Débit estimé exposé : 10 Mbit/s.</p>
+          <p>Latence estimée : 100 ms.</p>
+          <p>Profil réseau exposé : 4G.</p>
+        </article>
+
+      </div>
+
+      <div class="project-panel">
+
+        <span class="project-status">OBSERVATION</span>
+
+        <h3>Interprétation des mesures</h3>
+
+        <p>
+          Les mesures de débit présentent des variations
+          entre les essais. Cette différence peut dépendre
+          des conditions réseau au moment du test, de la charge
+          de la connexion et des caractéristiques de la ressource
+          téléchargée.
+        </p>
+
+        <p>
+          Les estimations fournies par le navigateur et les
+          mesures réalisées par l'outil sont deux informations
+          distinctes. Elles ne doivent pas être confondues.
+        </p>
+
+      </div>
+
+    </section>
+
+    <!-- LIMITES -->
+    <section class="content-section">
+
+      <div class="section-heading">
+
+        <p class="eyebrow">05 — LIMITES TECHNIQUES</p>
+
+        <h2>Comprendre la portée des résultats</h2>
+
+        <p>
+          Un diagnostic réalisé dans un navigateur reste
+          dépendant des interfaces et des permissions
+          exposées par celui-ci.
+        </p>
+
+      </div>
+
+      <div class="domain-grid">
+
+        <article class="domain-card">
+          <h3>Accès matériel limité</h3>
+          <p>
+            Le navigateur ne donne pas nécessairement accès
+            à toutes les informations physiques du processeur,
+            de la mémoire ou de la carte graphique.
+          </p>
+        </article>
+
+        <article class="domain-card">
+          <h3>Mesures variables</h3>
+          <p>
+            La latence et le débit évoluent selon les conditions
+            réseau, la charge du serveur et le moment de la mesure.
+          </p>
+        </article>
+
+        <article class="domain-card">
+          <h3>Portée du test</h3>
+          <p>
+            Les résultats ne remplacent pas un diagnostic
+            matériel spécialisé ni une mesure réseau
+            réalisée dans des conditions de laboratoire.
+          </p>
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- CONCLUSION -->
+    <section class="content-section">
+
+      <div class="section-heading">
+
+        <p class="eyebrow">06 — CONCLUSION</p>
+
+        <h2>Une première expérimentation validée</h2>
+
+        <p>
+          L'outil Diagnostic système a été testé sur un
+          environnement réel. Les fonctions principales
+          de collecte, de mesure, d'historique, d'export
+          et de suppression des données ont été vérifiées.
+        </p>
+
+        <p>
+          Cette première réalisation établit une base technique
+          pour de futures expérimentations consacrées
+          aux systèmes, aux réseaux et aux infrastructures.
+        </p>
+
+        <a href="../../diagnostic/" class="primary-link">
+          Ouvrir le diagnostic système
+          <span aria-hidden="true">→</span>
+        </a>
+
+        <a href="../" class="primary-link">
+          Retour au laboratoire
+          <span aria-hidden="true">→</span>
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- PIED DE PAGE -->
+  <footer class="site-footer">
+
+    <p class="footer-brand">TAKOUBAKOY LAB</p>
+
+    <p class="footer-tagline">Digital Independence</p>
+
+    <nav class="footer-nav" aria-label="Navigation de pied de page">
+      <a href="../../systemes/">Systèmes</a>
+      <a href="../../securite/">Sécurité</a>
+      <a href="../../outils-solutions/">Outils & Solutions</a>
+      <a href="../../projets/">Projets</a>
+      <a href="../../ressources/">Ressources</a>
+      <a href="../">Laboratoire</a>
+    </nav>
+
+    <p class="footer-copy">
+      © 2026 TAKOUBAKOY LAB — Tous droits réservés.
+    </p>
+
+  </footer>
+
+</body>
+</html>
+
