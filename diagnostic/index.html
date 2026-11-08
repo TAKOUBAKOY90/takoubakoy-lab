@@ -94,9 +94,21 @@
 
         <h2>Informations système</h2>
 
-        <p>
-          Les données seront affichées après l'activation
-          du module de diagnostic.
+              <p>
+          Consultez les informations techniques de votre environnement
+          et actualisez les résultats à tout moment.
+        </p>
+
+        <button
+          type="button"
+          id="diag-refresh"
+          class="primary-link">
+          Actualiser le diagnostic
+          <span aria-hidden="true">↻</span>
+        </button>
+
+        <p id="diag-last-update" aria-live="polite">
+          Diagnostic initialisé.
         </p>
 
       </div>
