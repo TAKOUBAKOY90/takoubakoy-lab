@@ -149,8 +149,20 @@
           <p>Type : <span id="diag-network-type">En attente</span></p>
           <p>Profil : <span id="diag-network-profile">En attente</span></p>
           <p>Débit descendant : <span id="diag-network-downlink">En attente</span></p>
-          <p>Latence estimée : <span id="diag-network-rtt">En attente</span></p>
+                    <p>Latence estimée : <span id="diag-network-rtt">En attente</span></p>
+          <p>Latence HTTP mesurée : <span id="diag-http-latency">Non testée</span></p>
           <p>Économie de données : <span id="diag-network-save-data">En attente</span></p>
+
+          <button
+            type="button"
+            id="diag-http-test"
+            class="primary-link">
+            Tester la latence HTTP
+          </button>
+
+          <p id="diag-http-status" aria-live="polite">
+            Aucun test effectué.
+          </p>
         </article>
                 <article class="domain-card">
           <span class="card-number">06 — GRAPHIQUE</span>
