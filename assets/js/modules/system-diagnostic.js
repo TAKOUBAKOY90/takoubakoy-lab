@@ -2,7 +2,7 @@
 /* ========================================
    TAKOUBAKOY LAB — System Diagnostic
    Module : Diagnostic environnement
-   Version : 1.1.0
+   Version : 1.2.0
 ======================================== */
 
 (() => {
@@ -34,9 +34,12 @@
       return "Navigateur non identifié";
     };
 
+    // Navigateur et plateforme.
     setValue("diag-user-agent", getBrowserName(info.userAgent));
     setValue("diag-platform", info.platform);
     setValue("diag-language", info.language);
+
+    // Processeur et mémoire.
     setValue("diag-cores", info.cores);
 
     setValue(
@@ -46,15 +49,45 @@
         : info.memory
     );
 
+    // Affichage.
     setValue(
       "diag-resolution",
       `${info.screen.width} × ${info.screen.height} pixels`
     );
 
     setValue("diag-pixel-ratio", `${info.screen.pixelRatio}x`);
+
+    // Connexion.
     setValue("diag-online", info.online ? "Connecté" : "Hors ligne");
 
-    // Informations graphiques WebGL.
+    // Informations réseau complémentaires.
+    const network = info.network;
+
+    setValue("diag-network-type", network?.type || "Non disponible");
+    setValue("diag-network-profile", network?.effectiveType || "Non disponible");
+
+    setValue(
+      "diag-network-downlink",
+      typeof network?.downlink === "number"
+        ? `${network.downlink} Mbit/s (estimation)`
+        : "Non disponible"
+    );
+
+    setValue(
+      "diag-network-rtt",
+      typeof network?.rtt === "number"
+        ? `${network.rtt} ms (estimation)`
+        : "Non disponible"
+    );
+
+    setValue(
+      "diag-network-save-data",
+      typeof network?.saveData === "boolean"
+        ? network.saveData ? "Activée" : "Désactivée"
+        : "Non disponible"
+    );
+
+    // Informations graphiques.
     const graphics = info.graphics;
 
     setValue(
