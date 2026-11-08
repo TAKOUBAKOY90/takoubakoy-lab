@@ -663,7 +663,104 @@
         consent.disabled = false;
       }
     };
+    // Exportation locale du rapport système.
+    const exportButton = document.getElementById("diag-export");
 
+    if (exportButton) {
+      exportButton.addEventListener("click", () => {
+        const info = getInfo();
+        const network = info.network || {};
+        const graphics = info.graphics || {};
+        const speedHistory = readSpeedHistory();
+        const latencyHistory = readLatencyHistory();
+
+        const formatValue = value => {
+          if (value === undefined || value === null || value === "") {
+            return "Non disponible";
+          }
+
+          return String(value);
+        };
+
+        const speedLines = speedHistory.length
+          ? speedHistory.map((item, index) =>
+              `${index + 1}. ${item.speed.toFixed(2)} Mbit/s — ` +
+              `${(item.bytes / 1000000).toFixed(3)} Mo — ` +
+              `${new Date(item.date).toLocaleString("fr-FR")}`
+            ).join("\n")
+          : "Aucun test enregistré.";
+
+        const latencyLines = latencyHistory.length
+          ? latencyHistory.map((item, index) =>
+              `${index + 1}. ${item.latency.toFixed(1)} ms — ` +
+              `${new Date(item.date).toLocaleString("fr-FR")}`
+            ).join("\n")
+          : "Aucun test enregistré.";
+
+        const report = [
+          "TAKOUBAKOY LAB",
+          "RAPPORT DE DIAGNOSTIC SYSTÈME",
+          "========================================",
+          "",
+          `Date du rapport : ${new Date().toLocaleString("fr-FR")}`,
+          "",
+          "1. NAVIGATEUR",
+          `Navigateur : ${getBrowserName(info.userAgent)}`,
+          `User-Agent : ${formatValue(info.userAgent)}`,
+          `Plateforme : ${formatValue(info.platform)}`,
+          `Langue : ${formatValue(info.language)}`,
+          "",
+          "2. PROCESSEUR ET MÉMOIRE",
+          `Processeurs logiques : ${formatValue(info.cores)}`,
+          `Mémoire exposée : ${formatValue(info.memory)}`,
+          "",
+          "3. AFFICHAGE",
+          `Résolution : ${info.screen.width} × ${info.screen.height} pixels`,
+          `Densité de pixels : ${info.screen.pixelRatio}x`,
+          "",
+          "4. CONNEXION RÉSEAU",
+          `État : ${info.online ? "Connecté" : "Hors ligne"}`,
+          `Type : ${formatValue(network.type)}`,
+          `Profil : ${formatValue(network.effectiveType)}`,
+          `Débit descendant estimé : ${formatValue(network.downlink)}`,
+          `Latence estimée : ${formatValue(network.rtt)}`,
+          `Économie de données : ${formatValue(network.saveData)}`,
+          "",
+          "5. GRAPHIQUE ET WEBGL",
+          `WebGL : ${graphics.available ? "Disponible" : "Non disponible"}`,
+          `Version : ${formatValue(graphics.version)}`,
+          `Fabricant : ${formatValue(graphics.vendor)}`,
+          `Processeur graphique : ${formatValue(graphics.renderer)}`,
+          "",
+          "6. HISTORIQUE DES TESTS DE DÉBIT",
+          speedLines,
+          "",
+          "7. HISTORIQUE DES TESTS DE LATENCE HTTP",
+          latencyLines,
+          "",
+          "========================================",
+          "Rapport généré localement par TAKOUBAKOY LAB.",
+          "Les informations n'ont pas été envoyées à un serveur."
+        ].join("\n");
+
+        const blob = new Blob(
+          [report],
+          { type: "text/plain;charset=utf-8" }
+        );
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "takoubakoy-lab-diagnostic.txt";
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(url);
+      });
+    }
     // Actualisation manuelle du diagnostic.
     const refreshButton = document.getElementById(
       "diag-refresh"
