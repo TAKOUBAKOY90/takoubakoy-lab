@@ -2,7 +2,7 @@
 /* ========================================
    TAKOUBAKOY LAB — System Diagnostic
    Module : Diagnostic environnement
-   Version : 1.3.0
+   Version : 1.4.0
 ======================================== */
 
 (() => {
@@ -35,12 +35,9 @@
     const updateDiagnostic = () => {
       const info = getInfo();
 
-      // Navigateur et plateforme.
       setValue("diag-user-agent", getBrowserName(info.userAgent));
       setValue("diag-platform", info.platform);
       setValue("diag-language", info.language);
-
-      // Processeur et mémoire.
       setValue("diag-cores", info.cores);
 
       setValue(
@@ -50,18 +47,14 @@
           : info.memory
       );
 
-      // Affichage.
       setValue(
         "diag-resolution",
         `${info.screen.width} × ${info.screen.height} pixels`
       );
 
       setValue("diag-pixel-ratio", `${info.screen.pixelRatio}x`);
-
-      // Connexion.
       setValue("diag-online", info.online ? "Connecté" : "Hors ligne");
 
-      // Informations réseau.
       const network = info.network;
 
       setValue("diag-network-type", network?.type || "Non disponible");
@@ -88,7 +81,6 @@
           : "Non disponible"
       );
 
-      // Informations graphiques.
       const graphics = info.graphics;
 
       setValue(
@@ -101,21 +93,85 @@
       setValue("diag-gpu-vendor", graphics?.vendor || "Non disponible");
       setValue("diag-gpu-renderer", graphics?.renderer || "Non disponible");
 
-      // Date et heure de la dernière actualisation.
-      const now = new Date();
-
       setValue(
         "diag-last-update",
-        `Dernière actualisation : ${now.toLocaleString("fr-FR")}`
+        `Dernière actualisation : ${new Date().toLocaleString("fr-FR")}`
       );
 
       document.documentElement.classList.add("system-diagnostic-ready");
+    };
+
+    const runHttpLatencyTest = async () => {
+      const resultElement = document.getElementById("diag-http-latency");
+      const statusElement = document.getElementById("diag-http-status");
+      const testButton = document.getElementById("diag-http-test");
+
+      if (!resultElement || !statusElement || !testButton) {
+        return;
+      }
+
+      if (!navigator.onLine) {
+        resultElement.textContent = "Indisponible";
+        statusElement.textContent = "Aucune connexion Internet détectée.";
+        return;
+      }
+
+      testButton.disabled = true;
+      resultElement.textContent = "Mesure en cours...";
+      statusElement.textContent = "Exécution de trois requêtes HTTP.";
+
+      const samples = [];
+      const target = new URL("../assets/images/favicon.svg", document.baseURI);
+
+      try {
+        for (let i = 0; i < 3; i += 1) {
+          target.searchParams.set("diagnostic", `${Date.now()}-${i}`);
+
+          const start = performance.now();
+
+          const response = await fetch(target.href, {
+            method: "GET",
+            cache: "no-store",
+            credentials: "same-origin"
+          });
+
+          const duration = performance.now() - start;
+
+          if (!response.ok) {
+            throw new Error(`Réponse HTTP ${response.status}`);
+          }
+
+          await response.body?.cancel();
+
+          samples.push(duration);
+        }
+
+        const average =
+          samples.reduce((total, value) => total + value, 0) /
+          samples.length;
+
+        resultElement.textContent = `${Math.round(average)} ms`;
+        statusElement.textContent =
+          "Moyenne de trois requêtes HTTP vers le serveur TAKOUBAKOY LAB.";
+      } catch (error) {
+        resultElement.textContent = "Échec du test";
+        statusElement.textContent =
+          "Impossible de mesurer la latence HTTP. Vérifiez la connexion et réessayez.";
+      } finally {
+        testButton.disabled = false;
+      }
     };
 
     const refreshButton = document.getElementById("diag-refresh");
 
     if (refreshButton) {
       refreshButton.addEventListener("click", updateDiagnostic);
+    }
+
+    const httpTestButton = document.getElementById("diag-http-test");
+
+    if (httpTestButton) {
+      httpTestButton.addEventListener("click", runHttpLatencyTest);
     }
 
     updateDiagnostic();
