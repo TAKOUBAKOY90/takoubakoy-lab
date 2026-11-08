@@ -219,7 +219,7 @@
         );
       } catch (error) {
         // Le stockage local peut être indisponible.
-      }
+             }
 
       renderNetworkDashboard();
     };
@@ -401,8 +401,7 @@
         list.appendChild(item);
       });
     };
-
-    // Enregistrement d'un résultat de débit.
+         // Enregistrement d'un résultat de débit.
     const saveSpeedHistory = (speed, bytes) => {
       try {
         const history = readSpeedHistory();
@@ -663,7 +662,7 @@
         consent.disabled = false;
       }
     };
-    // Exportation locale du rapport système.
+         // Exportation locale du rapport système.
     const exportButton = document.getElementById("diag-export");
 
     if (exportButton) {
@@ -680,6 +679,14 @@
           }
 
           return String(value);
+        };
+
+        const formatBoolean = value => {
+          if (typeof value !== "boolean") {
+            return "Non disponible";
+          }
+
+          return value ? "Activée" : "Désactivée";
         };
 
         const speedLines = speedHistory.length
@@ -712,7 +719,7 @@
           "",
           "2. PROCESSEUR ET MÉMOIRE",
           `Processeurs logiques : ${formatValue(info.cores)}`,
-          `Mémoire exposée : ${formatValue(info.memory)}`,
+          `Mémoire exposée : ${typeof info.memory === "number" ? `${info.memory} Go (estimation)` : formatValue(info.memory)}`,
           "",
           "3. AFFICHAGE",
           `Résolution : ${info.screen.width} × ${info.screen.height} pixels`,
@@ -722,9 +729,9 @@
           `État : ${info.online ? "Connecté" : "Hors ligne"}`,
           `Type : ${formatValue(network.type)}`,
           `Profil : ${formatValue(network.effectiveType)}`,
-          `Débit descendant estimé : ${formatValue(network.downlink)}`,
-          `Latence estimée : ${formatValue(network.rtt)}`,
-          `Économie de données : ${formatValue(network.saveData)}`,
+          `Débit descendant estimé : ${typeof network.downlink === "number" ? `${network.downlink} Mbit/s` : formatValue(network.downlink)}`,
+          `Latence estimée : ${typeof network.rtt === "number" ? `${network.rtt} ms` : formatValue(network.rtt)}`,
+          `Économie de données : ${formatBoolean(network.saveData)}`,
           "",
           "5. GRAPHIQUE ET WEBGL",
           `WebGL : ${graphics.available ? "Disponible" : "Non disponible"}`,
@@ -761,6 +768,7 @@
         URL.revokeObjectURL(url);
       });
     }
+
     // Actualisation manuelle du diagnostic.
     const refreshButton = document.getElementById(
       "diag-refresh"
