@@ -2,7 +2,7 @@
 /* ========================================
    TAKOUBAKOY LAB — System Diagnostic
    Module : Diagnostic environnement
-   Version : 1.0.0
+   Version : 1.1.0
 ======================================== */
 
 (() => {
@@ -34,14 +34,11 @@
       return "Navigateur non identifié";
     };
 
-    setValue(
-      "diag-user-agent",
-      getBrowserName(info.userAgent)
-    );
-
+    setValue("diag-user-agent", getBrowserName(info.userAgent));
     setValue("diag-platform", info.platform);
     setValue("diag-language", info.language);
     setValue("diag-cores", info.cores);
+
     setValue(
       "diag-memory",
       typeof info.memory === "number"
@@ -54,27 +51,29 @@
       `${info.screen.width} × ${info.screen.height} pixels`
     );
 
-    setValue(
-      "diag-pixel-ratio",
-      `${info.screen.pixelRatio}x`
-    );
+    setValue("diag-pixel-ratio", `${info.screen.pixelRatio}x`);
+    setValue("diag-online", info.online ? "Connecté" : "Hors ligne");
+
+    // Informations graphiques WebGL.
+    const graphics = info.graphics;
 
     setValue(
-      "diag-online",
-      info.online ? "Connecté" : "Hors ligne"
+      "diag-webgl",
+      graphics?.available
+        ? `Disponible (${graphics.version})`
+        : "Non disponible"
     );
 
-    document.documentElement.classList.add(
-      "system-diagnostic-ready"
-    );
+    setValue("diag-gpu-vendor", graphics?.vendor || "Non disponible");
+    setValue("diag-gpu-renderer", graphics?.renderer || "Non disponible");
+
+    document.documentElement.classList.add("system-diagnostic-ready");
   };
 
   if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initSystemDiagnostic,
-      { once: true }
-    );
+    document.addEventListener("DOMContentLoaded", initSystemDiagnostic, {
+      once: true
+    });
   } else {
     initSystemDiagnostic();
   }
