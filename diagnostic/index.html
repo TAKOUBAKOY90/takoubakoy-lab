@@ -163,6 +163,40 @@
           <p id="diag-http-status" aria-live="polite">
             Aucun test effectué.
           </p>
+                           <div class="speed-test-panel">
+
+            <h4>Test de débit Internet</h4>
+
+            <p>
+              Mesurez le débit descendant de votre connexion.
+              Ce test téléchargera jusqu'à 1 Mo de données.
+            </p>
+
+            <label>
+              <input
+                type="checkbox"
+                id="diag-speed-consent">
+              J'autorise le téléchargement des données nécessaires au test.
+            </label>
+
+            <button
+              type="button"
+              id="diag-speed-test"
+              class="primary-link"
+              disabled>
+              Lancer le test de débit
+            </button>
+
+            <p>
+              Débit mesuré :
+              <strong id="diag-speed-result">Non testé</strong>
+            </p>
+
+            <p id="diag-speed-status" aria-live="polite">
+              En attente de votre autorisation.
+            </p>
+
+          </div>
         </article>
                 <article class="domain-card">
           <span class="card-number">06 — GRAPHIQUE</span>
