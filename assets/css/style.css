@@ -515,3 +515,20 @@ main {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* 16 — TABLEAU DE BORD RÉSEAU */
+
+.network-dashboard,
+.network-chart {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.network-chart canvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0 20px;
+}
