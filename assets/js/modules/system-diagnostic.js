@@ -2,7 +2,7 @@
 /* ========================================
    TAKOUBAKOY LAB — System Diagnostic
    Module : Diagnostic environnement
-   Version : 1.5.0
+   Version : 1.6.0
 ======================================== */
 
 (() => {
@@ -12,6 +12,9 @@
     const getInfo = window.TAKOUBAKOY?.getBrowserInfo;
 
     if (typeof getInfo !== "function") return;
+
+    const HISTORY_KEY = "takoubakoy_speed_history";
+    const MAX_HISTORY = 3;
 
     const setValue = (id, value) => {
       const element = document.getElementById(id);
@@ -95,6 +98,94 @@
       document.documentElement.classList.add("system-diagnostic-ready");
     };
 
+    // Évaluation indicative du débit.
+    const getSpeedQuality = (speed) => {
+      if (speed < 5) {
+        return "Connexion limitée";
+      }
+
+      if (speed < 25) {
+        return "Connexion modérée";
+      }
+
+      return "Connexion rapide";
+    };
+
+    // Lecture sécurisée de l'historique local.
+    const readSpeedHistory = () => {
+      try {
+        const stored = localStorage.getItem(HISTORY_KEY);
+        const history = stored ? JSON.parse(stored) : [];
+
+        if (!Array.isArray(history)) return [];
+
+        return history
+          .filter(item =>
+            Number.isFinite(item.speed) &&
+            Number.isFinite(item.bytes) &&
+            typeof item.date === "string"
+          )
+          .slice(0, MAX_HISTORY);
+      } catch (error) {
+        return [];
+      }
+    };
+
+    // Affichage de l'historique.
+    const renderSpeedHistory = () => {
+      const list = document.getElementById("diag-speed-history");
+      if (!list) return;
+
+      const history = readSpeedHistory();
+      list.replaceChildren();
+
+      if (history.length === 0) {
+        const item = document.createElement("li");
+        item.textContent = "Aucun test enregistré.";
+        list.appendChild(item);
+        return;
+      }
+
+      history.forEach(test => {
+        const item = document.createElement("li");
+        const date = new Date(test.date);
+
+        item.textContent =
+          `${date.toLocaleString("fr-FR")} — ` +
+          `${test.speed.toFixed(2)} Mbit/s — ` +
+          `${(test.bytes / 1000000).toFixed(3)} Mo`;
+
+        list.appendChild(item);
+      });
+    };
+
+    // Enregistrement d'un résultat.
+    const saveSpeedHistory = (speed, bytes) => {
+      try {
+        const history = readSpeedHistory();
+
+        history.unshift({
+          speed,
+          bytes,
+          date: new Date().toISOString()
+        });
+
+        localStorage.setItem(
+          HISTORY_KEY,
+          JSON.stringify(history.slice(0, MAX_HISTORY))
+        );
+
+        renderSpeedHistory();
+      } catch (error) {
+        const status = document.getElementById("diag-speed-status");
+
+        if (status) {
+          status.textContent +=
+            " L'historique n'a pas pu être sauvegardé dans ce navigateur.";
+        }
+      }
+    };
+
     // Test de latence HTTP.
     const runHttpLatencyTest = async () => {
       const resultElement = document.getElementById("diag-http-latency");
@@ -158,6 +249,7 @@
       const button = document.getElementById("diag-speed-test");
       const result = document.getElementById("diag-speed-result");
       const status = document.getElementById("diag-speed-status");
+      const quality = document.getElementById("diag-speed-quality");
 
       if (!consent || !button || !result || !status) return;
 
@@ -184,6 +276,10 @@
       consent.disabled = true;
       result.textContent = "Mesure en cours...";
       status.textContent = "Téléchargement du fichier de test...";
+
+      if (quality) {
+        quality.textContent = "Évaluation en cours...";
+      }
 
       const start = performance.now();
       let transferred = 0;
@@ -235,8 +331,19 @@
 
         status.textContent =
           `Test terminé : ${(transferred / 1000000).toFixed(3)} Mo transférés en ${duration.toFixed(2)} secondes.`;
+
+        if (quality) {
+          quality.textContent = getSpeedQuality(megabitsPerSecond);
+        }
+
+        saveSpeedHistory(megabitsPerSecond, transferred);
       } catch (error) {
         result.textContent = "Échec du test";
+
+        if (quality) {
+          quality.textContent = "Évaluation indisponible.";
+        }
+
         status.textContent =
           "Le téléchargement n'a pas pu être mesuré. Vérifiez la connexion et réessayez.";
       } finally {
@@ -268,7 +375,23 @@
       speedButton.addEventListener("click", runSpeedTest);
     }
 
+    const clearHistoryButton =
+      document.getElementById("diag-speed-history-clear");
+
+    if (clearHistoryButton) {
+      clearHistoryButton.addEventListener("click", () => {
+        try {
+          localStorage.removeItem(HISTORY_KEY);
+        } catch (error) {
+          // Le stockage local peut être désactivé.
+        }
+
+        renderSpeedHistory();
+      });
+    }
+
     updateDiagnostic();
+    renderSpeedHistory();
   };
 
   if (document.readyState === "loading") {
