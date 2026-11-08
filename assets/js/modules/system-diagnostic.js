@@ -2,7 +2,7 @@
 /* ========================================
    TAKOUBAKOY LAB — System Diagnostic
    Module : Diagnostic environnement
-   Version : 1.4.0
+   Version : 1.5.0
 ======================================== */
 
 (() => {
@@ -11,16 +11,11 @@
   const initSystemDiagnostic = () => {
     const getInfo = window.TAKOUBAKOY?.getBrowserInfo;
 
-    if (typeof getInfo !== "function") {
-      return;
-    }
+    if (typeof getInfo !== "function") return;
 
     const setValue = (id, value) => {
       const element = document.getElementById(id);
-
-      if (element) {
-        element.textContent = String(value);
-      }
+      if (element) element.textContent = String(value);
     };
 
     const getBrowserName = (userAgent) => {
@@ -28,7 +23,6 @@
       if (/Firefox\//.test(userAgent)) return "Mozilla Firefox";
       if (/Chrome\//.test(userAgent)) return "Google Chrome";
       if (/Safari\//.test(userAgent)) return "Apple Safari";
-
       return "Navigateur non identifié";
     };
 
@@ -101,14 +95,13 @@
       document.documentElement.classList.add("system-diagnostic-ready");
     };
 
+    // Test de latence HTTP.
     const runHttpLatencyTest = async () => {
       const resultElement = document.getElementById("diag-http-latency");
       const statusElement = document.getElementById("diag-http-status");
       const testButton = document.getElementById("diag-http-test");
 
-      if (!resultElement || !statusElement || !testButton) {
-        return;
-      }
+      if (!resultElement || !statusElement || !testButton) return;
 
       if (!navigator.onLine) {
         resultElement.textContent = "Indisponible";
@@ -135,15 +128,12 @@
             credentials: "same-origin"
           });
 
-          const duration = performance.now() - start;
-
           if (!response.ok) {
             throw new Error(`Réponse HTTP ${response.status}`);
           }
 
           await response.body?.cancel();
-
-          samples.push(duration);
+          samples.push(performance.now() - start);
         }
 
         const average =
@@ -162,16 +152,120 @@
       }
     };
 
-    const refreshButton = document.getElementById("diag-refresh");
+    // Test de débit avec limite de téléchargement.
+    const runSpeedTest = async () => {
+      const consent = document.getElementById("diag-speed-consent");
+      const button = document.getElementById("diag-speed-test");
+      const result = document.getElementById("diag-speed-result");
+      const status = document.getElementById("diag-speed-status");
 
+      if (!consent || !button || !result || !status) return;
+
+      if (!consent.checked) {
+        status.textContent = "Autorisation nécessaire avant le test.";
+        return;
+      }
+
+      if (!navigator.onLine) {
+        result.textContent = "Indisponible";
+        status.textContent = "Aucune connexion Internet détectée.";
+        return;
+      }
+
+      const maxBytes = 1000000;
+      const target = new URL(
+        "../assets/images/og-takoubakoy-lab.png",
+        document.baseURI
+      );
+
+      target.searchParams.set("speed-test", Date.now());
+
+      button.disabled = true;
+      consent.disabled = true;
+      result.textContent = "Mesure en cours...";
+      status.textContent = "Téléchargement du fichier de test...";
+
+      const start = performance.now();
+      let transferred = 0;
+
+      try {
+        const response = await fetch(target.href, {
+          method: "GET",
+          cache: "no-store",
+          credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+          throw new Error(`Réponse HTTP ${response.status}`);
+        }
+
+        if (new URL(response.url).origin !== window.location.origin) {
+          throw new Error("Origine du téléchargement non autorisée.");
+        }
+
+        if (!response.body) {
+          throw new Error("Flux de téléchargement indisponible.");
+        }
+
+        const reader = response.body.getReader();
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) break;
+
+          transferred += value.byteLength;
+
+          if (transferred > maxBytes) {
+            await reader.cancel();
+            throw new Error("Limite de téléchargement dépassée.");
+          }
+        }
+
+        const duration = (performance.now() - start) / 1000;
+
+        if (transferred === 0 || duration <= 0) {
+          throw new Error("Mesure invalide.");
+        }
+
+        const megabitsPerSecond =
+          (transferred * 8) / duration / 1000000;
+
+        result.textContent = `${megabitsPerSecond.toFixed(2)} Mbit/s`;
+
+        status.textContent =
+          `Test terminé : ${(transferred / 1000000).toFixed(3)} Mo transférés en ${duration.toFixed(2)} secondes.`;
+      } catch (error) {
+        result.textContent = "Échec du test";
+        status.textContent =
+          "Le téléchargement n'a pas pu être mesuré. Vérifiez la connexion et réessayez.";
+      } finally {
+        button.disabled = !consent.checked;
+        consent.disabled = false;
+      }
+    };
+
+    const refreshButton = document.getElementById("diag-refresh");
     if (refreshButton) {
       refreshButton.addEventListener("click", updateDiagnostic);
     }
 
     const httpTestButton = document.getElementById("diag-http-test");
-
     if (httpTestButton) {
       httpTestButton.addEventListener("click", runHttpLatencyTest);
+    }
+
+    const speedConsent = document.getElementById("diag-speed-consent");
+    const speedButton = document.getElementById("diag-speed-test");
+
+    if (speedConsent && speedButton) {
+      speedButton.disabled = !speedConsent.checked;
+
+      speedConsent.addEventListener("change", () => {
+        speedButton.disabled = !speedConsent.checked;
+      });
+
+      speedButton.addEventListener("click", runSpeedTest);
     }
 
     updateDiagnostic();
