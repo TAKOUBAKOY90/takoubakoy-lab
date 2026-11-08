@@ -1,1 +1,230 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rapport technique de l'expérimentation TAKOUBAKOY LAB consacrée à WSL 2, Ubuntu et Docker Desktop.">
+    <title>Expérimentation 02 — WSL 2 & Docker | TAKOUBAKOY LAB</title>
+    <link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <a href="../../index.html" class="logo">
+            <img src="../../assets/images/takoubakoy-lab-logo.svg" alt="TAKOUBAKOY LAB">
+        </a>
+
+        <nav class="main-nav">
+            <a href="../../index.html">Accueil</a>
+            <a href="../../systemes/">Systèmes</a>
+            <a href="../../securite/">Sécurité</a>
+            <a href="../../outils-solutions/">Outils & Solutions</a>
+            <a href="../../projets/">Projets</a>
+            <a href="../../ressources/">Ressources</a>
+            <a href="../">Laboratoire</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="page-hero">
+        <p class="eyebrow">TAKOUBAKOY LAB — EXPÉRIMENTATIONS DOCUMENTÉES</p>
+        <h1>Expérimentation 02 : WSL 2 & Docker</h1>
+        <p>
+            Mise en place et validation d'un environnement Linux virtualisé
+            sous Windows 11 avec Ubuntu et Docker Desktop.
+        </p>
+    </section>
+
+    <section class="content-section">
+        <h2>1. Objectif de l'expérimentation</h2>
+        <p>
+            Cette expérimentation consiste à installer et vérifier un environnement
+            de développement Linux sous Windows 11 à l'aide de WSL 2, puis à
+            intégrer Docker Desktop afin d'exécuter des conteneurs.
+        </p>
+        <p>Les objectifs techniques sont les suivants :</p>
+        <ul>
+            <li>Installer et configurer WSL 2.</li>
+            <li>Déployer Ubuntu comme distribution Linux.</li>
+            <li>Installer Docker Desktop avec le moteur WSL 2.</li>
+            <li>Vérifier l'accès à Docker depuis Windows PowerShell et Ubuntu.</li>
+            <li>Exécuter un conteneur de validation avec l'image officielle Hello World.</li>
+        </ul>
+    </section>
+
+    <section class="content-section">
+        <h2>2. Environnement de test</h2>
+
+        <h3>Configuration matérielle</h3>
+        <ul>
+            <li>Ordinateur : ASUS ROG Strix G16 (G614FM).</li>
+            <li>Processeur : AMD Ryzen 9 9955HX, 16 cœurs et 32 threads.</li>
+            <li>Mémoire vive : 32 Go DDR5.</li>
+            <li>Carte graphique : NVIDIA GeForce RTX 5060 Laptop GPU.</li>
+            <li>Système hôte : Windows 11 Famille.</li>
+        </ul>
+
+        <h3>Environnement logiciel</h3>
+        <ul>
+            <li>WSL : version par défaut 2.</li>
+            <li>Distribution Linux : Ubuntu 26.04.1 LTS.</li>
+            <li>Noyau Linux : 6.18.54.1-microsoft-standard-WSL2.</li>
+            <li>Docker Desktop : moteur utilisant WSL 2.</li>
+            <li>Docker Engine / CLI : Docker 29.9.2, build a82e528.</li>
+            <li>Docker Compose : version 5.6.1.</li>
+            <li>Architecture Linux : x86_64.</li>
+        </ul>
+    </section>
+
+    <section class="content-section">
+        <h2>3. Procédure de déploiement</h2>
+
+        <h3>Étape 1 — Installation de WSL 2</h3>
+        <p>
+            WSL a été installé depuis Windows avec la commande suivante,
+            exécutée dans PowerShell :
+        </p>
+        <pre><code>wsl --install -d Ubuntu</code></pre>
+
+        <p>
+            Après le redémarrage de Windows, Ubuntu a été initialisé et
+            un compte utilisateur Linux local a été créé.
+        </p>
+
+        <h3>Étape 2 — Vérification de WSL</h3>
+        <p>La configuration a été contrôlée avec :</p>
+        <pre><code>wsl --status
+wsl --list --verbose</code></pre>
+
+        <p>
+            Ubuntu apparaît avec la version 2 de WSL. Docker Desktop utilise
+            également une distribution interne appelée docker-desktop.
+        </p>
+
+        <h3>Étape 3 — Installation de Docker Desktop</h3>
+        <p>
+            Docker Desktop a été installé sous Windows avec le moteur WSL 2.
+            L'installation a été réalisée en mode utilisateur, sans connexion
+            obligatoire à un compte Docker.
+        </p>
+
+        <h3>Étape 4 — Vérification des outils Docker</h3>
+        <p>Depuis PowerShell, les commandes suivantes ont été exécutées :</p>
+        <pre><code>docker --version
+docker compose version</code></pre>
+
+        <p>
+            La disponibilité de la commande Docker a ensuite été vérifiée
+            directement depuis le terminal Ubuntu :
+        </p>
+        <pre><code>docker --version</code></pre>
+    </section>
+
+    <section class="content-section">
+        <h2>4. Tests et résultats observés</h2>
+
+        <h3>Test 1 — Vérification de WSL 2</h3>
+        <p><strong>Résultat :</strong> validé.</p>
+        <p>
+            Ubuntu 26.04.1 LTS a démarré sous le noyau Linux
+            6.18.54.1-microsoft-standard-WSL2. La distribution est
+            configurée pour fonctionner avec WSL 2.
+        </p>
+
+        <h3>Test 2 — Disponibilité de Docker dans Windows</h3>
+        <p><strong>Résultat :</strong> validé.</p>
+        <p>
+            PowerShell a reconnu Docker 29.9.2 ainsi que Docker Compose 5.6.1.
+        </p>
+
+        <h3>Test 3 — Disponibilité de Docker dans Ubuntu</h3>
+        <p><strong>Résultat :</strong> validé.</p>
+        <p>
+            La commande <code>docker --version</code> a également fonctionné
+            dans le terminal Ubuntu.
+        </p>
+
+        <h3>Test 4 — Exécution d'un conteneur Hello World</h3>
+        <p>Commande exécutée depuis PowerShell :</p>
+        <pre><code>docker run hello-world</code></pre>
+
+        <p><strong>Résultat :</strong> validé.</p>
+        <p>
+            Docker a téléchargé l'image <code>hello-world:latest</code>,
+            créé et exécuté le conteneur. Le message de confirmation
+            « Hello from Docker! » a été affiché.
+        </p>
+    </section>
+
+    <section class="content-section">
+        <h2>5. Observations et limites techniques</h2>
+        <ul>
+            <li>
+                WSL 2 permet d'exécuter un environnement Linux intégré à Windows
+                sans remplacer le système hôte.
+            </li>
+            <li>
+                Docker Desktop fournit l'accès au moteur Docker depuis Windows
+                et depuis la distribution Ubuntu configurée.
+            </li>
+            <li>
+                La distribution Ubuntu peut apparaître à l'état « Stopped »
+                lorsqu'aucune session Linux n'est active. Cet état ne signifie
+                pas que l'installation est défectueuse.
+            </li>
+            <li>
+                Le test Hello World confirme le fonctionnement élémentaire
+                du moteur Docker, mais ne constitue pas un benchmark de
+                performances.
+            </li>
+            <li>
+                Aucun test de déploiement d'une application multi-conteneurs
+                avec Docker Compose n'a été réalisé dans cette expérimentation.
+            </li>
+        </ul>
+    </section>
+
+    <section class="content-section">
+        <h2>6. Conclusion</h2>
+        <p>
+            L'expérimentation 02 a permis de mettre en place un environnement
+            Linux fonctionnel sous Windows 11 avec WSL 2, Ubuntu et Docker Desktop.
+        </p>
+        <p>
+            Les vérifications réalisées confirment que Docker est accessible
+            depuis PowerShell et Ubuntu et qu'un conteneur de test peut être
+            téléchargé et exécuté correctement.
+        </p>
+        <p>
+            Cet environnement constitue une base technique pour de futurs
+            travaux sur les conteneurs, les services web, les infrastructures
+            locales et les environnements de développement isolés.
+        </p>
+    </section>
+
+    <section class="content-section">
+        <h2>Navigation</h2>
+        <p>
+            <a href="../">← Retour au Laboratoire</a>
+        </p>
+        <p>
+            <a href="diagnostic-systeme.html">Consulter l'expérimentation 01 — Diagnostic système</a>
+        </p>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>© TAKOUBAKOY LAB — Digital Independence</p>
+    </div>
+</footer>
+
+</body>
+</html>
+
