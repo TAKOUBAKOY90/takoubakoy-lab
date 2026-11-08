@@ -195,6 +195,33 @@
             <p id="diag-speed-status" aria-live="polite">
               En attente de votre autorisation.
             </p>
+                             
+            <div class="speed-quality-panel">
+              <h4>Qualité du débit mesuré</h4>
+              <p id="diag-speed-quality" aria-live="polite">
+                En attente d'un test.
+              </p>
+            </div>
+
+            <div class="speed-history-panel">
+              <h4>Historique des trois derniers tests</h4>
+
+              <ul id="diag-speed-history">
+                <li>Aucun test enregistré.</li>
+              </ul>
+
+              <button
+                type="button"
+                id="diag-speed-history-clear"
+                class="primary-link">
+                Effacer l'historique
+              </button>
+
+              <p>
+                L'historique sera conservé uniquement dans ce navigateur.
+              </p>
+            </div>
+
 
           </div>
         </article>
