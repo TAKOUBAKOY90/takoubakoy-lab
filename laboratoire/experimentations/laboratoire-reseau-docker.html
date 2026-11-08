@@ -1,1 +1,391 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Rapport technique de l'expérimentation 03 de TAKOUBAKOY LAB : réseau privé Docker, communication entre conteneurs et serveur Nginx local.">
+
+  <title>Expérimentation 03 — Laboratoire réseau Docker | TAKOUBAKOY LAB</title>
+
+  <link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+
+    <a href="../../index.html" class="brand" aria-label="TAKOUBAKOY LAB — Accueil">
+      <img
+        src="../../assets/images/takoubakoy-lab-logo.svg"
+        alt="TAKOUBAKOY LAB — Digital Independence"
+        class="brand-logo">
+    </a>
+
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a href="../../index.html">Accueil</a>
+      <a href="../../systemes/">Systèmes</a>
+      <a href="../../securite/">Sécurité</a>
+      <a href="../../outils-solutions/">Outils & Solutions</a>
+      <a href="../../projets/">Projets</a>
+      <a href="../../ressources/">Ressources</a>
+      <a href="../">Laboratoire</a>
+    </nav>
+
+  </header>
+
+  <main>
+
+    <section class="hero">
+
+      <p class="eyebrow">TAKOUBAKOY LAB — EXPÉRIMENTATION 03</p>
+
+      <h1>Laboratoire réseau<br><span>Docker & Nginx</span></h1>
+
+      <p class="hero-description">
+        Création d'un réseau Docker privé, communication entre
+        conteneurs et validation d'un serveur web local.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">OBJECTIF</p>
+        <h2>1. Objectif de l'expérimentation</h2>
+      </div>
+
+      <p>
+        Cette expérimentation vise à comprendre le fonctionnement
+        d'un réseau Docker de type bridge et à vérifier la
+        communication entre deux conteneurs Linux.
+      </p>
+
+      <p>
+        Un serveur web Nginx est déployé dans un conteneur,
+        puis interrogé depuis un second conteneur Alpine.
+        L'accès HTTP depuis Windows est également testé
+        au moyen d'une publication de port sur l'interface locale.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ENVIRONNEMENT</p>
+        <h2>2. Configuration technique</h2>
+      </div>
+
+      <ul>
+        <li>Système hôte : Windows 11 Famille.</li>
+        <li>Terminal : Windows PowerShell 5.1.</li>
+        <li>Plateforme : Docker Desktop avec moteur WSL 2.</li>
+        <li>Réseau Docker : takoubakoy-lab-net.</li>
+        <li>Pilote réseau : bridge.</li>
+        <li>Serveur : lab-server, image nginx:alpine.</li>
+        <li>Client : lab-client, image alpine:latest.</li>
+        <li>Port HTTP interne : 80/tcp.</li>
+        <li>Publication locale : 127.0.0.1:8080 vers le port 80.</li>
+      </ul>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ARCHITECTURE</p>
+        <h2>3. Architecture réseau</h2>
+      </div>
+
+      <p>
+        Les deux conteneurs sont connectés au même réseau
+        Docker défini par l'utilisateur. Ils peuvent communiquer
+        au moyen de leurs noms grâce à la résolution DNS interne.
+      </p>
+
+      <pre><code>Windows 11
+    |
+    | http://127.0.0.1:8080
+    |
+Docker Desktop / WSL 2
+    |
+    +-- takoubakoy-lab-net (bridge)
+          |
+          +-- lab-server
+          |     nginx:alpine
+          |     HTTP : port 80
+          |
+          +-- lab-client
+                alpine:latest
+                ping / wget</code></pre>
+
+      <p>
+        Le port 8080 est publié sur l'adresse de boucle locale
+        127.0.0.1. Le service est ainsi destiné aux tests
+        depuis la machine hôte, sans publication volontaire
+        sur les interfaces réseau externes.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">PROCÉDURE</p>
+        <h2>4. Déploiement du laboratoire</h2>
+      </div>
+
+      <h3>4.1 — Inventaire des réseaux</h3>
+
+      <pre><code>docker network ls</code></pre>
+
+      <p>
+        Les réseaux standards bridge, host et none
+        ont été observés.
+      </p>
+
+      <h3>4.2 — Création du réseau privé</h3>
+
+      <pre><code>docker network create takoubakoy-lab-net</code></pre>
+
+      <p>
+        Le réseau takoubakoy-lab-net a été créé avec
+        le pilote bridge et la portée local.
+      </p>
+
+      <h3>4.3 — Déploiement initial du serveur</h3>
+
+      <pre><code>docker run -d --name lab-server --network takoubakoy-lab-net nginx:alpine</code></pre>
+
+      <p>
+        L'image Nginx Alpine a été téléchargée et
+        le conteneur lab-server a démarré.
+      </p>
+
+      <h3>4.4 — Déploiement du client</h3>
+
+      <pre><code>docker run -dit --name lab-client --network takoubakoy-lab-net alpine:latest sh</code></pre>
+
+      <p>
+        Le conteneur lab-client a été démarré
+        sur le même réseau privé.
+      </p>
+
+      <h3>4.5 — Publication locale du serveur</h3>
+
+      <p>
+        Après les tests internes, le serveur initial
+        a été supprimé puis recréé avec une publication
+        de port limitée à l'interface locale.
+      </p>
+
+      <pre><code>docker rm -f lab-server
+
+docker run -d --name lab-server --network takoubakoy-lab-net -p 127.0.0.1:8080:80 nginx:alpine</code></pre>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">RÉSULTATS</p>
+        <h2>5. Tests et mesures</h2>
+      </div>
+
+      <h3>Test 1 — État des conteneurs</h3>
+
+      <pre><code>docker ps</code></pre>
+
+      <p>
+        Résultat : les conteneurs lab-server et lab-client
+        ont été observés à l'état Up.
+      </p>
+
+      <h3>Test 2 — Résolution DNS et connectivité ICMP</h3>
+
+      <pre><code>docker exec lab-client ping -c 4 lab-server</code></pre>
+
+      <p>
+        Le nom lab-server a été résolu vers
+        l'adresse IPv4 172.18.0.2 lors du test initial.
+      </p>
+
+      <ul>
+        <li>Paquets transmis : 4.</li>
+        <li>Paquets reçus : 4.</li>
+        <li>Perte de paquets : 0 %.</li>
+        <li>Latence minimale : 0,092 ms.</li>
+        <li>Latence moyenne : 0,134 ms.</li>
+        <li>Latence maximale : 0,251 ms.</li>
+      </ul>
+
+      <p>
+        Résultat : résolution DNS et connectivité ICMP
+        validées entre les conteneurs.
+      </p>
+
+      <h3>Test 3 — Communication HTTP interne</h3>
+
+      <pre><code>docker exec lab-client wget -qO- http://lab-server</code></pre>
+
+      <p>
+        Le client Alpine a récupéré le document HTML
+        de la page d'accueil Nginx, contenant
+        le titre Welcome to nginx!.
+      </p>
+
+      <p>
+        Résultat : communication HTTP interne validée.
+      </p>
+
+      <h3>Test 4 — Accès depuis Microsoft Edge</h3>
+
+      <p>
+        L'adresse http://127.0.0.1:8080 a été ouverte
+        dans Microsoft Edge sous Windows.
+      </p>
+
+      <p>
+        La page d'accueil Nginx s'est affichée correctement.
+      </p>
+
+      <h3>Test 5 — Vérification des en-têtes HTTP</h3>
+
+      <pre><code>curl.exe -I http://127.0.0.1:8080</code></pre>
+
+      <p>Résultats observés :</p>
+
+      <ul>
+        <li>Code HTTP : 200 OK.</li>
+        <li>Serveur : nginx/1.31.8.</li>
+        <li>Content-Type : text/html.</li>
+        <li>Content-Length : 896 octets.</li>
+        <li>Connection : keep-alive.</li>
+      </ul>
+
+      <p>
+        Résultat : le serveur HTTP local répond correctement.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ANALYSE</p>
+        <h2>6. Observations et limites</h2>
+      </div>
+
+      <ul>
+        <li>
+          Le réseau bridge défini par l'utilisateur permet
+          la communication entre les conteneurs qui y sont connectés.
+        </li>
+        <li>
+          La résolution DNS interne permet de joindre
+          lab-server sans saisir directement son adresse IP.
+        </li>
+        <li>
+          Les latences ICMP relevées correspondent à une
+          session de test locale et ne constituent pas
+          une mesure générale des performances Docker.
+        </li>
+        <li>
+          L'adresse IP d'un conteneur peut changer
+          après sa recréation.
+        </li>
+        <li>
+          La publication sur 127.0.0.1 limite l'écoute
+          à l'interface locale, sans constituer à elle seule
+          une garantie complète de sécurité du système.
+        </li>
+        <li>
+          Aucun test de charge, de segmentation avancée
+          ou de résistance aux attaques n'a été réalisé.
+        </li>
+      </ul>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">CONCLUSION</p>
+        <h2>7. Conclusion technique</h2>
+      </div>
+
+      <p>
+        L'expérimentation 03 confirme le fonctionnement
+        d'un laboratoire réseau Docker local reposant
+        sur deux conteneurs Linux et un réseau privé bridge.
+      </p>
+
+      <p>
+        La résolution DNS, la communication ICMP,
+        la récupération d'une page HTTP depuis un conteneur
+        et l'accès local depuis Windows ont été vérifiés.
+      </p>
+
+      <p>
+        Le serveur Nginx a répondu avec le code HTTP 200 OK,
+        confirmant le fonctionnement de la publication
+        locale du service.
+      </p>
+
+      <p>
+        Ces résultats constituent une base pour de futures
+        expérimentations sur les services web,
+        les réseaux de conteneurs et les infrastructures
+        numériques maîtrisées.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">NAVIGATION</p>
+        <h2>Autres travaux du laboratoire</h2>
+      </div>
+
+      <p>
+        <a href="../" class="primary-link">
+          Retour au Laboratoire →
+        </a>
+      </p>
+
+      <p>
+        <a href="diagnostic-systeme.html" class="primary-link">
+          Expérimentation 01 — Diagnostic système →
+        </a>
+      </p>
+
+      <p>
+        <a href="environnement-wsl2-docker.html" class="primary-link">
+          Expérimentation 02 — WSL 2 & Docker →
+        </a>
+      </p>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+
+    <p class="footer-brand">TAKOUBAKOY LAB</p>
+    <p class="footer-tagline">Digital Independence</p>
+
+    <p class="footer-copy">
+      © 2026 TAKOUBAKOY LAB — Tous droits réservés.
+    </p>
+
+  </footer>
+
+</body>
+</html>
+
