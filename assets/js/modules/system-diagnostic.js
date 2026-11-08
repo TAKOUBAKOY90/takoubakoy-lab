@@ -15,6 +15,159 @@
 
     const HISTORY_KEY = "takoubakoy_speed_history";
     const MAX_HISTORY = 3;
+     
+    const LATENCY_HISTORY_KEY = "takoubakoy_latency_history";
+
+    const readLatencyHistory = () => {
+      try {
+        const stored = localStorage.getItem(LATENCY_HISTORY_KEY);
+        const history = stored ? JSON.parse(stored) : [];
+
+        if (!Array.isArray(history)) return [];
+
+        return history
+          .filter(item =>
+            Number.isFinite(item.latency) &&
+            typeof item.date === "string"
+          )
+          .slice(0, MAX_HISTORY);
+      } catch (error) {
+        return [];
+      }
+    };
+
+    const drawChart = (canvasId, values, unit, color) => {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      const width = canvas.width;
+      const height = canvas.height;
+      const padding = 42;
+
+      context.clearRect(0, 0, width, height);
+      context.font = "13px Arial";
+      context.fillStyle = "#a3afc2";
+      context.strokeStyle = "#344054";
+      context.lineWidth = 1;
+
+      context.beginPath();
+      context.moveTo(padding, 15);
+      context.lineTo(padding, height - padding);
+      context.lineTo(width - 12, height - padding);
+      context.stroke();
+
+      if (values.length === 0) {
+        context.fillText("Aucune mesure disponible", padding + 10, height / 2);
+        return;
+      }
+
+      const maximum = Math.max(...values.map(item => item.value), 1);
+      const minimum = Math.min(...values.map(item => item.value), 0);
+      const range = Math.max(maximum - minimum, maximum * 0.15, 1);
+
+      const points = values.map((item, index) => {
+        const x = values.length === 1
+          ? width / 2
+          : padding + index * (width - padding - 24) / (values.length - 1);
+
+        const y = height - padding -
+          ((item.value - minimum) / range) * (height - padding - 35);
+
+        return { x, y, value: item.value };
+      });
+
+      context.strokeStyle = color;
+      context.lineWidth = 3;
+      context.beginPath();
+
+      points.forEach((point, index) => {
+        if (index === 0) {
+          context.moveTo(point.x, point.y);
+        } else {
+          context.lineTo(point.x, point.y);
+        }
+      });
+
+      context.stroke();
+
+      points.forEach((point, index) => {
+        context.fillStyle = color;
+        context.beginPath();
+        context.arc(point.x, point.y, 5, 0, Math.PI * 2);
+        context.fill();
+
+        context.fillStyle = "#f2f5fa";
+        context.fillText(
+          `${point.value.toFixed(1)} ${unit}`,
+          Math.min(point.x + 7, width - 110),
+          Math.max(point.y - 12, 15)
+        );
+
+        context.fillStyle = "#a3afc2";
+        context.fillText(
+          `Test ${index + 1}`,
+          point.x - 20,
+          height - 12
+        );
+      });
+    };
+
+    const renderNetworkDashboard = () => {
+      const speeds = readSpeedHistory();
+      const latencies = readLatencyHistory();
+
+      if (speeds.length > 0) {
+        const values = speeds.map(item => item.speed);
+        const average = values.reduce((sum, value) => sum + value, 0) /
+          values.length;
+
+        setValue("diag-speed-latest", `${values[0].toFixed(2)} Mbit/s`);
+        setValue("diag-speed-average", `${average.toFixed(2)} Mbit/s`);
+        setValue("diag-speed-best", `${Math.max(...values).toFixed(2)} Mbit/s`);
+      } else {
+        setValue("diag-speed-latest", "Non disponible");
+        setValue("diag-speed-average", "Non disponible");
+        setValue("diag-speed-best", "Non disponible");
+      }
+
+      drawChart(
+        "diag-speed-chart",
+        speeds.slice().reverse().map(item => ({ value: item.speed })),
+        "Mbit/s",
+        "#2788f5"
+      );
+
+      drawChart(
+        "diag-latency-chart",
+        latencies.slice().reverse().map(item => ({ value: item.latency })),
+        "ms",
+        "#ed3548"
+      );
+    };
+
+    const saveLatencyHistory = latency => {
+      try {
+        const history = readLatencyHistory();
+
+        history.unshift({
+          latency,
+          date: new Date().toISOString()
+        });
+
+        localStorage.setItem(
+          LATENCY_HISTORY_KEY,
+          JSON.stringify(history.slice(0, MAX_HISTORY))
+        );
+      } catch (error) {
+        // Le stockage local peut être indisponible.
+      }
+
+      renderNetworkDashboard();
+    };
+
 
     const setValue = (id, value) => {
       const element = document.getElementById(id);
@@ -232,6 +385,7 @@
           samples.length;
 
         resultElement.textContent = `${Math.round(average)} ms`;
+         saveLatencyHistory(average);
         statusElement.textContent =
           "Moyenne de trois requêtes HTTP vers le serveur TAKOUBAKOY LAB.";
       } catch (error) {
@@ -382,16 +536,20 @@
       clearHistoryButton.addEventListener("click", () => {
         try {
           localStorage.removeItem(HISTORY_KEY);
+localStorage.removeItem(LATENCY_HISTORY_KEY);
         } catch (error) {
           // Le stockage local peut être désactivé.
         }
 
-        renderSpeedHistory();
+       renderSpeedHistory();
+         renderNetworkDashboard();
+         renderNetworkDashboard();
       });
     }
 
     updateDiagnostic();
     renderSpeedHistory();
+     renderNetworkDashboard();
   };
 
   if (document.readyState === "loading") {
