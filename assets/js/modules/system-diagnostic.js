@@ -2,7 +2,7 @@
 /* ========================================
    TAKOUBAKOY LAB — System Diagnostic
    Module : Diagnostic environnement
-   Version : 1.2.0
+   Version : 1.3.0
 ======================================== */
 
 (() => {
@@ -14,8 +14,6 @@
     if (typeof getInfo !== "function") {
       return;
     }
-
-    const info = getInfo();
 
     const setValue = (id, value) => {
       const element = document.getElementById(id);
@@ -34,73 +32,93 @@
       return "Navigateur non identifié";
     };
 
-    // Navigateur et plateforme.
-    setValue("diag-user-agent", getBrowserName(info.userAgent));
-    setValue("diag-platform", info.platform);
-    setValue("diag-language", info.language);
+    const updateDiagnostic = () => {
+      const info = getInfo();
 
-    // Processeur et mémoire.
-    setValue("diag-cores", info.cores);
+      // Navigateur et plateforme.
+      setValue("diag-user-agent", getBrowserName(info.userAgent));
+      setValue("diag-platform", info.platform);
+      setValue("diag-language", info.language);
 
-    setValue(
-      "diag-memory",
-      typeof info.memory === "number"
-        ? `${info.memory} Go (estimation)`
-        : info.memory
-    );
+      // Processeur et mémoire.
+      setValue("diag-cores", info.cores);
 
-    // Affichage.
-    setValue(
-      "diag-resolution",
-      `${info.screen.width} × ${info.screen.height} pixels`
-    );
+      setValue(
+        "diag-memory",
+        typeof info.memory === "number"
+          ? `${info.memory} Go (estimation)`
+          : info.memory
+      );
 
-    setValue("diag-pixel-ratio", `${info.screen.pixelRatio}x`);
+      // Affichage.
+      setValue(
+        "diag-resolution",
+        `${info.screen.width} × ${info.screen.height} pixels`
+      );
 
-    // Connexion.
-    setValue("diag-online", info.online ? "Connecté" : "Hors ligne");
+      setValue("diag-pixel-ratio", `${info.screen.pixelRatio}x`);
 
-    // Informations réseau complémentaires.
-    const network = info.network;
+      // Connexion.
+      setValue("diag-online", info.online ? "Connecté" : "Hors ligne");
 
-    setValue("diag-network-type", network?.type || "Non disponible");
-    setValue("diag-network-profile", network?.effectiveType || "Non disponible");
+      // Informations réseau.
+      const network = info.network;
 
-    setValue(
-      "diag-network-downlink",
-      typeof network?.downlink === "number"
-        ? `${network.downlink} Mbit/s (estimation)`
-        : "Non disponible"
-    );
+      setValue("diag-network-type", network?.type || "Non disponible");
+      setValue("diag-network-profile", network?.effectiveType || "Non disponible");
 
-    setValue(
-      "diag-network-rtt",
-      typeof network?.rtt === "number"
-        ? `${network.rtt} ms (estimation)`
-        : "Non disponible"
-    );
+      setValue(
+        "diag-network-downlink",
+        typeof network?.downlink === "number"
+          ? `${network.downlink} Mbit/s (estimation)`
+          : "Non disponible"
+      );
 
-    setValue(
-      "diag-network-save-data",
-      typeof network?.saveData === "boolean"
-        ? network.saveData ? "Activée" : "Désactivée"
-        : "Non disponible"
-    );
+      setValue(
+        "diag-network-rtt",
+        typeof network?.rtt === "number"
+          ? `${network.rtt} ms (estimation)`
+          : "Non disponible"
+      );
 
-    // Informations graphiques.
-    const graphics = info.graphics;
+      setValue(
+        "diag-network-save-data",
+        typeof network?.saveData === "boolean"
+          ? network.saveData ? "Activée" : "Désactivée"
+          : "Non disponible"
+      );
 
-    setValue(
-      "diag-webgl",
-      graphics?.available
-        ? `Disponible (${graphics.version})`
-        : "Non disponible"
-    );
+      // Informations graphiques.
+      const graphics = info.graphics;
 
-    setValue("diag-gpu-vendor", graphics?.vendor || "Non disponible");
-    setValue("diag-gpu-renderer", graphics?.renderer || "Non disponible");
+      setValue(
+        "diag-webgl",
+        graphics?.available
+          ? `Disponible (${graphics.version})`
+          : "Non disponible"
+      );
 
-    document.documentElement.classList.add("system-diagnostic-ready");
+      setValue("diag-gpu-vendor", graphics?.vendor || "Non disponible");
+      setValue("diag-gpu-renderer", graphics?.renderer || "Non disponible");
+
+      // Date et heure de la dernière actualisation.
+      const now = new Date();
+
+      setValue(
+        "diag-last-update",
+        `Dernière actualisation : ${now.toLocaleString("fr-FR")}`
+      );
+
+      document.documentElement.classList.add("system-diagnostic-ready");
+    };
+
+    const refreshButton = document.getElementById("diag-refresh");
+
+    if (refreshButton) {
+      refreshButton.addEventListener("click", updateDiagnostic);
+    }
+
+    updateDiagnostic();
   };
 
   if (document.readyState === "loading") {
