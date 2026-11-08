@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Diagnostic de l'environnement numérique : navigateur, plateforme, mémoire disponible, processeurs logiques, affichage et connexion réseau.">
+  <meta name="robots" content="index, follow">
+
+  <meta name="theme-color" content="#080b12">
+
+  <link rel="canonical" href="https://takoubakoy90.github.io/takoubakoy-lab/diagnostic/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Diagnostic système — TAKOUBAKOY LAB">
+  <meta property="og:description" content="Analysez les informations techniques accessibles depuis votre navigateur.">
+  <meta property="og:url" content="https://takoubakoy90.github.io/takoubakoy-lab/diagnostic/">
+  <meta property="og:image" content="https://takoubakoy90.github.io/takoubakoy-lab/assets/images/og-takoubakoy-lab.png">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="TAKOUBAKOY LAB">
+
+  <title>Diagnostic système — TAKOUBAKOY LAB</title>
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+  <link rel="stylesheet" href="../assets/css/style.css">
+
+  <!-- JavaScript TAKOUBAKOY LAB -->
+  <script src="../assets/js/modules/browser-info.js" defer></script>
+  <script src="../assets/js/main.js" defer></script>
+
+</head>
+
+<body>
+
+  <header class="site-header">
+
+    <a href="../index.html" class="brand"
+       aria-label="TAKOUBAKOY LAB - Accueil">
+
+      <img
+        src="../assets/images/takoubakoy-lab-logo.svg"
+        alt="TAKOUBAKOY LAB — Digital Independence"
+        class="brand-logo">
+
+    </a>
+
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a href="../index.html">Accueil</a>
+      <a href="../systemes/">Systèmes</a>
+      <a href="../securite/">Sécurité</a>
+      <a href="../outils-solutions/">Outils & Solutions</a>
+      <a href="../projets/">Projets</a>
+      <a href="../ressources/">Ressources</a>
+      <a href="../laboratoire/">Laboratoire</a>
+    </nav>
+
+  </header>
+
+  <main>
+
+    <!-- INTRODUCTION -->
+    <section class="hero">
+
+      <p class="eyebrow">TAKOUBAKOY LAB — OUTIL 01</p>
+
+      <h1>
+        Diagnostic.<br>
+        <span>Observer.</span><br>
+        Comprendre.
+      </h1>
+
+      <p class="hero-description">
+        Découvrez les informations techniques que votre navigateur
+        met à disposition sur votre environnement numérique.
+        Les résultats sont consultés localement.
+      </p>
+
+      <a href="#diagnostic" class="primary-link">
+        Lancer le diagnostic
+        <span aria-hidden="true">→</span>
+      </a>
+
+    </section>
+
+    <!-- RÉSULTATS -->
+    <section class="content-section" id="diagnostic">
+
+      <div class="section-heading">
+
+        <p class="eyebrow">ANALYSE DE L'ENVIRONNEMENT</p>
+
+        <h2>Informations système</h2>
+
+        <p>
+          Les données seront affichées après l'activation
+          du module de diagnostic.
+        </p>
+
+      </div>
+
+      <div class="domain-grid">
+
+        <article class="domain-card">
+          <span class="card-number">01 — NAVIGATEUR</span>
+          <h3>Navigateur & plateforme</h3>
+          <p>Navigateur : <span id="diag-user-agent">En attente</span></p>
+          <p>Plateforme : <span id="diag-platform">En attente</span></p>
+          <p>Langue : <span id="diag-language">En attente</span></p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">02 — PROCESSEUR</span>
+          <h3>Capacités de calcul</h3>
+          <p>Processeurs logiques : <span id="diag-cores">En attente</span></p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">03 — MÉMOIRE</span>
+          <h3>Mémoire estimée</h3>
+          <p>Mémoire exposée : <span id="diag-memory">En attente</span></p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">04 — AFFICHAGE</span>
+          <h3>Écran</h3>
+          <p>Résolution : <span id="diag-resolution">En attente</span></p>
+          <p>Densité de pixels : <span id="diag-pixel-ratio">En attente</span></p>
+        </article>
+
+        <article class="domain-card">
+          <span class="card-number">05 — RÉSEAU</span>
+          <h3>Connexion</h3>
+          <p>État : <span id="diag-online">En attente</span></p>
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- MÉTHODOLOGIE -->
+    <section class="content-section">
+
+      <div class="project-panel">
+
+        <span class="project-status">INFORMATIONS ET LIMITES</span>
+
+        <h3>Un diagnostic accessible, pas une analyse matérielle complète.</h3>
+
+        <p>
+          Les informations disponibles dépendent du navigateur
+          et de ses règles de confidentialité. La mémoire est une
+          estimation exposée par le navigateur et le nombre de
+          processeurs correspond aux unités logiques disponibles.
+          Ces résultats ne remplacent pas un diagnostic matériel
+          réalisé au niveau du système d'exploitation.
+        </p>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+
+    <p class="footer-brand">TAKOUBAKOY LAB</p>
+
+    <p class="footer-tagline">Digital Independence</p>
+
+    <nav class="footer-nav" aria-label="Navigation de pied de page">
+      <a href="../index.html">Accueil</a>
+      <a href="../laboratoire/">Laboratoire</a>
+      <a href="../outils-solutions/">Outils & Solutions</a>
+    </nav>
+
+    <p class="footer-copy">
+      © 2026 TAKOUBAKOY LAB — Tous droits réservés.
+    </p>
+
+  </footer>
+
+</body>
+</html>
