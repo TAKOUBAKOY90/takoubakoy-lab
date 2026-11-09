@@ -1,0 +1,617 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Rapport technique de l'expérimentation 05 de TAKOUBAKOY LAB : sauvegarde, vérification et restauration des volumes Docker WordPress et MariaDB.">
+
+  <title>Expérimentation 05 — Sauvegarde et restauration Docker | TAKOUBAKOY LAB</title>
+
+  <link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+
+    <a href="../../index.html" class="brand" aria-label="TAKOUBAKOY LAB — Accueil">
+      <img
+        src="../../assets/images/takoubakoy-lab-logo.svg"
+        alt="TAKOUBAKOY LAB — Digital Independence"
+        class="brand-logo">
+    </a>
+
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a href="../../index.html">Accueil</a>
+      <a href="../../systemes/">Systèmes</a>
+      <a href="../../securite/">Sécurité</a>
+      <a href="../../outils-solutions/">Outils & Solutions</a>
+      <a href="../../projets/">Projets</a>
+      <a href="../../ressources/">Ressources</a>
+      <a href="../">Laboratoire</a>
+    </nav>
+
+  </header>
+
+  <main>
+
+    <section class="hero">
+
+      <p class="eyebrow">TAKOUBAKOY LAB — EXPÉRIMENTATION 05</p>
+
+      <h1>Sauvegarde et restauration<br><span>des volumes Docker</span></h1>
+
+      <p class="hero-description">
+        Protection des données persistantes, création
+        d'archives et restauration d'une infrastructure
+        WordPress et MariaDB dans de nouveaux volumes Docker.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">OBJECTIF</p>
+        <h2>1. Objectif de l'expérimentation</h2>
+      </div>
+
+      <p>
+        Cette expérimentation vise à maîtriser les opérations
+        de sauvegarde et de restauration des données persistantes
+        utilisées par des applications conteneurisées.
+      </p>
+
+      <p>
+        Le laboratoire s'appuie sur l'environnement WordPress
+        et MariaDB déployé lors de l'expérimentation 04.
+      </p>
+
+      <p>
+        Les données des deux volumes Docker sont exportées
+        dans des archives compressées, puis restaurées
+        dans de nouveaux volumes indépendants.
+      </p>
+
+      <p>
+        L'objectif final est de vérifier l'intégrité des fichiers,
+        le fonctionnement de la base de données restaurée
+        et la disponibilité de l'application WordPress.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ENVIRONNEMENT</p>
+        <h2>2. Configuration technique</h2>
+      </div>
+
+      <ul>
+        <li>Système hôte : Windows 11 Famille.</li>
+        <li>Terminal : Windows PowerShell 5.1.</li>
+        <li>Plateforme : Docker Desktop avec moteur WSL 2.</li>
+        <li>Base de données : MariaDB 11.4.</li>
+        <li>Application web : WordPress avec PHP 8.3 et Apache.</li>
+        <li>Outil d'archivage : tar.</li>
+        <li>Image utilitaire : Alpine Linux 3.22.</li>
+        <li>Format des sauvegardes : archives TAR compressées GZIP.</li>
+        <li>Stockage : volumes Docker nommés.</li>
+        <li>Accès local de restauration : 127.0.0.1:8082.</li>
+      </ul>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ARCHITECTURE</p>
+        <h2>3. Architecture de sauvegarde et restauration</h2>
+      </div>
+
+      <p>
+        L'expérimentation repose sur deux volumes sources
+        issus du déploiement WordPress et MariaDB de
+        l'expérimentation 04.
+      </p>
+
+      <pre><code>ENVIRONNEMENT SOURCE
+    |
+    +-- experiment-04-compose_db_data
+    |       Données MariaDB
+    |
+    +-- experiment-04-compose_wordpress_data
+            Fichiers WordPress
+
+                |
+                | Sauvegarde TAR + GZIP
+                v
+
+ARCHIVES DE SAUVEGARDE
+    |
+    +-- wordpress-data.tar.gz
+    |
+    +-- mariadb-data.tar.gz
+
+                |
+                | Extraction
+                v
+
+NOUVEAUX VOLUMES DOCKER
+    |
+    +-- experiment-05-restore-wordpress
+    |
+    +-- experiment-05-restore-mariadb
+
+                |
+                | Démarrage des services
+                v
+
+ENVIRONNEMENT RESTAURÉ
+    |
+    +-- MariaDB 11.4
+    |
+    +-- WordPress / PHP 8.3 / Apache
+    |
+    +-- Réseau : experiment-05-restore-net
+    |
+    +-- Accès : http://127.0.0.1:8082</code></pre>
+
+      <p>
+        Les volumes restaurés sont indépendants des volumes
+        sources. Cette séparation permet de tester la
+        récupération des données sans modifier l'installation
+        d'origine.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">PROCÉDURE</p>
+        <h2>4. Procédure de sauvegarde et restauration</h2>
+      </div>
+
+      <h3>4.1 — Préparation de l'environnement</h3>
+
+      <p>
+        Un dossier indépendant a été créé pour stocker
+        les archives de sauvegarde.
+      </p>
+
+      <pre><code>New-Item -ItemType Directory -Force -Path "$HOME\TAKOUBAKOY-LAB\experiment-05-backup-restore"</code></pre>
+
+      <p>
+        Les conteneurs sources ont été arrêtés et retirés,
+        tout en conservant les volumes persistants.
+      </p>
+
+      <h3>4.2 — Vérification des volumes sources</h3>
+
+      <pre><code>docker volume inspect experiment-04-compose_db_data experiment-04-compose_wordpress_data</code></pre>
+
+      <p>
+        Les deux volumes sources ont été identifiés
+        et leur disponibilité confirmée.
+      </p>
+
+      <h3>4.3 — Sauvegarde des fichiers WordPress</h3>
+
+      <pre><code>docker run --rm `
+  -v experiment-04-compose_wordpress_data:/source:ro `
+  -v "$HOME\TAKOUBAKOY-LAB\experiment-05-backup-restore:/backup" `
+  alpine:3.22 `
+  tar -czf /backup/wordpress-data.tar.gz -C /source .</code></pre>
+
+      <p>
+        Le volume WordPress est monté en lecture seule.
+        Son contenu est exporté dans une archive compressée.
+      </p>
+
+      <h3>4.4 — Sauvegarde de MariaDB</h3>
+
+      <pre><code>docker run --rm `
+  -v experiment-04-compose_db_data:/source:ro `
+  -v "$HOME\TAKOUBAKOY-LAB\experiment-05-backup-restore:/backup" `
+  alpine:3.22 `
+  tar -czf /backup/mariadb-data.tar.gz -C /source .</code></pre>
+
+      <p>
+        Les fichiers de la base de données sont exportés
+        dans une seconde archive indépendante.
+      </p>
+
+      <p>
+        Les deux volumes sources sont montés en lecture seule
+        pendant les opérations de sauvegarde.
+      </p>
+
+      <h3>4.5 — Vérification des archives</h3>
+
+      <pre><code>Get-ChildItem "$HOME\TAKOUBAKOY-LAB\experiment-05-backup-restore" |
+Select-Object Name, Length, LastWriteTime</code></pre>
+
+      <p>Archives obtenues :</p>
+
+      <ul>
+        <li>wordpress-data.tar.gz : 36 948 151 octets.</li>
+        <li>mariadb-data.tar.gz : 2 546 972 octets.</li>
+      </ul>
+
+      <p>
+        La lecture du contenu des archives a été vérifiée
+        avec tar -tzf.
+      </p>
+
+      <pre><code>docker run --rm `
+  -v "$HOME\TAKOUBAKOY-LAB\experiment-05-backup-restore:/backup:ro" `
+  alpine:3.22 `
+  sh -c "tar -tzf /backup/wordpress-data.tar.gz > /dev/null && echo 'WORDPRESS: ARCHIVE OK' && tar -tzf /backup/mariadb-data.tar.gz > /dev/null && echo 'MARIADB: ARCHIVE OK'"</code></pre>
+
+      <p>Résultat observé :</p>
+
+      <pre><code>WORDPRESS: ARCHIVE OK
+MARIADB: ARCHIVE OK</code></pre>
+
+      <h3>4.6 — Création des volumes de restauration</h3>
+
+      <pre><code>docker volume create experiment-05-restore-wordpress
+
+docker volume create experiment-05-restore-mariadb</code></pre>
+
+      <p>
+        Deux nouveaux volumes ont été créés pour recevoir
+        les données restaurées.
+      </p>
+
+      <h3>4.7 — Restauration de WordPress</h3>
+
+      <pre><code>docker run --rm `
+  -v experiment-05-restore-wordpress:/destination `
+  -v "$HOME\TAKOUBAKOY-LAB\experiment-05-backup-restore:/backup:ro" `
+  alpine:3.22 `
+  tar -xzf /backup/wordpress-data.tar.gz -C /destination</code></pre>
+
+      <h3>4.8 — Restauration de MariaDB</h3>
+
+      <pre><code>docker run --rm `
+  -v experiment-05-restore-mariadb:/destination `
+  -v "$HOME\TAKOUBAKOY-LAB\experiment-05-backup-restore:/backup:ro" `
+  alpine:3.22 `
+  tar -xzf /backup/mariadb-data.tar.gz -C /destination</code></pre>
+
+      <p>
+        Les deux archives ont été extraites dans leurs
+        volumes de destination respectifs.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">RÉSULTATS</p>
+        <h2>5. Tests et vérifications</h2>
+      </div>
+
+      <h3>Test 1 — Comparaison des volumes</h3>
+
+      <p>
+        Les tailles des répertoires sources et restaurés
+        ont été comparées.
+      </p>
+
+      <ul>
+        <li>WordPress original : 121,3 Mo.</li>
+        <li>WordPress restauré : 121,3 Mo.</li>
+        <li>MariaDB originale : 159,3 Mo.</li>
+        <li>MariaDB restaurée : 159,3 Mo.</li>
+      </ul>
+
+      <p>
+        Résultat : les tailles occupées sont identiques.
+      </p>
+
+      <h3>Test 2 — Comparaison des fichiers</h3>
+
+      <p>
+        Une comparaison récursive a été réalisée
+        entre les répertoires sources et restaurés
+        avec la commande diff -qr.
+      </p>
+
+      <ul>
+        <li>WordPress : code de sortie 0.</li>
+        <li>MariaDB : code de sortie 0.</li>
+        <li>Différences détectées : aucune.</li>
+      </ul>
+
+      <p>
+        Résultat : les fichiers des volumes restaurés
+        sont identiques aux fichiers sources au moment
+        de cette comparaison.
+      </p>
+
+      <h3>Test 3 — Démarrage de MariaDB restaurée</h3>
+
+      <p>
+        Un nouveau conteneur MariaDB 11.4 a été démarré
+        en utilisant exclusivement le volume restauré.
+      </p>
+
+      <pre><code>docker run -d `
+  --name takoubakoy-restore-db `
+  -e MARIADB_ROOT_PASSWORD=[MOT_DE_PASSE_DE_TEST] `
+  -v experiment-05-restore-mariadb:/var/lib/mysql `
+  mariadb:11.4</code></pre>
+
+      <p>
+        Le journal du serveur a confirmé le démarrage
+        et la disponibilité du service.
+      </p>
+
+      <pre><code>mariadbd: ready for connections.</code></pre>
+
+      <p>Résultat : MariaDB restaurée opérationnelle.</p>
+
+      <h3>Test 4 — Vérification de la base WordPress</h3>
+
+      <p>
+        La base wordpress a été retrouvée dans
+        l'instance MariaDB restaurée.
+      </p>
+
+      <p>
+        Les douze tables WordPress ont été identifiées,
+        notamment :
+      </p>
+
+      <ul>
+        <li>wp_users</li>
+        <li>wp_usermeta</li>
+        <li>wp_posts</li>
+        <li>wp_postmeta</li>
+        <li>wp_options</li>
+        <li>wp_comments</li>
+        <li>wp_commentmeta</li>
+        <li>wp_terms</li>
+        <li>wp_term_taxonomy</li>
+        <li>wp_term_relationships</li>
+        <li>wp_termmeta</li>
+        <li>wp_links</li>
+      </ul>
+
+      <p>
+        Résultat : structure de la base WordPress restaurée
+        et accessible.
+      </p>
+
+      <h3>Test 5 — Vérification du compte administrateur</h3>
+
+      <p>
+        Le compte administrateur a été retrouvé
+        dans la table wp_users.
+      </p>
+
+      <ul>
+        <li>ID : 1.</li>
+        <li>Identifiant : labadmin.</li>
+        <li>Statut : 0 (actif).</li>
+      </ul>
+
+      <p>
+        Résultat : compte administrateur présent
+        dans la base restaurée.
+      </p>
+
+      <h3>Test 6 — Démarrage de WordPress restauré</h3>
+
+      <p>
+        Un nouveau conteneur WordPress avec PHP 8.3
+        et Apache a été démarré avec le volume restauré.
+        Il a été relié au conteneur MariaDB au moyen
+        d'un réseau Docker dédié.
+      </p>
+
+      <pre><code>docker network create experiment-05-restore-net
+
+docker network connect experiment-05-restore-net takoubakoy-restore-db</code></pre>
+
+      <p>
+        Le service WordPress a été publié sur le port local
+        8082, indépendamment de l'environnement source.
+      </p>
+
+      <pre><code>docker run -d `
+  --name takoubakoy-restore-wordpress `
+  --network experiment-05-restore-net `
+  --network-alias wordpress `
+  -p 127.0.0.1:8082:80 `
+  -e WORDPRESS_DB_HOST=takoubakoy-restore-db:3306 `
+  -e WORDPRESS_DB_USER=wpuser `
+  -e WORDPRESS_DB_PASSWORD=[MOT_DE_PASSE_DE_TEST] `
+  -e WORDPRESS_DB_NAME=wordpress `
+  -v experiment-05-restore-wordpress:/var/www/html `
+  wordpress:php8.3-apache</code></pre>
+
+      <p>
+        Résultat : les deux conteneurs restaurés
+        ont été observés à l'état Up.
+      </p>
+
+      <h3>Test 7 — Accès HTTP à l'application restaurée</h3>
+
+      <p>
+        Après adaptation des paramètres d'adresse
+        du site dans la base restaurée pour son accès
+        sur le port 8082, une requête HTTP a été réalisée.
+      </p>
+
+      <pre><code>curl.exe -I http://127.0.0.1:8082</code></pre>
+
+      <p>Résultat observé :</p>
+
+      <pre><code>HTTP/1.1 200 OK
+Server: Apache/2.4.69 (Debian)
+X-Powered-By: PHP/8.3.36
+Content-Type: text/html; charset=UTF-8</code></pre>
+
+      <p>
+        Le site WordPress restauré s'est également affiché
+        correctement dans Microsoft Edge.
+      </p>
+
+      <p>
+        Résultat : restauration fonctionnelle et accès web
+        validé.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ANALYSE</p>
+        <h2>6. Observations techniques</h2>
+      </div>
+
+      <ul>
+        <li>
+          Les volumes Docker permettent de séparer
+          les données persistantes du cycle de vie
+          des conteneurs.
+        </li>
+        <li>
+          Les archives TAR compressées facilitent
+          le transport et la conservation des données.
+        </li>
+        <li>
+          Le montage en lecture seule des volumes sources
+          permet de réaliser les sauvegardes sans modifier
+          les données d'origine.
+        </li>
+        <li>
+          La restauration dans de nouveaux volumes permet
+          de tester la récupération indépendamment
+          de l'environnement source.
+        </li>
+        <li>
+          La comparaison récursive des fichiers confirme
+          l'identité des données restaurées au moment
+          du contrôle.
+        </li>
+        <li>
+          Le démarrage de MariaDB et de WordPress à partir
+          des volumes restaurés confirme leur exploitabilité
+          dans un nouvel environnement de conteneurs.
+        </li>
+        <li>
+          Une sauvegarde de fichiers de base de données
+          doit être réalisée lorsque le serveur est arrêté
+          ou selon une méthode garantissant la cohérence
+          des données.
+        </li>
+      </ul>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">CONCLUSION</p>
+        <h2>7. Conclusion technique</h2>
+      </div>
+
+      <p>
+        L'expérimentation 05 confirme la capacité à sauvegarder
+        et restaurer les volumes persistants d'une application
+        composée de WordPress et MariaDB.
+      </p>
+
+      <p>
+        Les archives ont été vérifiées, les données restaurées
+        dans de nouveaux volumes et leur identité confirmée
+        par comparaison récursive des fichiers.
+      </p>
+
+      <p>
+        Le serveur MariaDB restauré a démarré correctement.
+        La base wordpress, ses douze tables et le compte
+        administrateur ont été retrouvés.
+      </p>
+
+      <p>
+        Enfin, le conteneur WordPress restauré a communiqué
+        avec MariaDB et le site a répondu avec le code
+        HTTP 200 OK.
+      </p>
+
+      <p>
+        Cette expérimentation démontre la maîtrise d'une
+        procédure de sauvegarde et de restauration des données
+        Docker, compétence essentielle pour la continuité
+        et la récupération des services numériques.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">NAVIGATION</p>
+        <h2>Autres travaux du laboratoire</h2>
+      </div>
+
+      <p>
+        <a href="../" class="primary-link">
+          Retour au Laboratoire →
+        </a>
+      </p>
+
+      <p>
+        <a href="diagnostic-systeme.html" class="primary-link">
+          Expérimentation 01 — Diagnostic système →
+        </a>
+      </p>
+
+      <p>
+        <a href="environnement-wsl2-docker.html" class="primary-link">
+          Expérimentation 02 — WSL 2 & Docker →
+        </a>
+      </p>
+
+      <p>
+        <a href="laboratoire-reseau-docker.html" class="primary-link">
+          Expérimentation 03 — Laboratoire réseau Docker →
+        </a>
+      </p>
+
+      <p>
+        <a href="deploiement-multi-conteneurs-docker-compose.html" class="primary-link">
+          Expérimentation 04 — Docker Compose →
+        </a>
+      </p>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+
+    <p class="footer-brand">TAKOUBAKOY LAB</p>
+    <p class="footer-tagline">Digital Independence</p>
+
+    <p class="footer-copy">
+      © 2026 TAKOUBAKOY LAB — Tous droits réservés.
+    </p>
+
+  </footer>
+
+</body>
+</html>
