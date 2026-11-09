@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Rapport technique de l'expérimentation 04 de TAKOUBAKOY LAB : déploiement multi-conteneurs avec Docker Compose, WordPress, MariaDB et volumes persistants.">
+
+  <title>Expérimentation 04 — Docker Compose | TAKOUBAKOY LAB</title>
+
+  <link rel="icon" type="image/svg+xml" href="../../assets/images/favicon.svg">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+
+    <a href="../../index.html" class="brand" aria-label="TAKOUBAKOY LAB — Accueil">
+      <img
+        src="../../assets/images/takoubakoy-lab-logo.svg"
+        alt="TAKOUBAKOY LAB — Digital Independence"
+        class="brand-logo">
+    </a>
+
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a href="../../index.html">Accueil</a>
+      <a href="../../systemes/">Systèmes</a>
+      <a href="../../securite/">Sécurité</a>
+      <a href="../../outils-solutions/">Outils & Solutions</a>
+      <a href="../../projets/">Projets</a>
+      <a href="../../ressources/">Ressources</a>
+      <a href="../">Laboratoire</a>
+    </nav>
+
+  </header>
+
+  <main>
+
+    <section class="hero">
+
+      <p class="eyebrow">TAKOUBAKOY LAB — EXPÉRIMENTATION 04</p>
+
+      <h1>Déploiement multi-conteneurs<br><span>Docker Compose</span></h1>
+
+      <p class="hero-description">
+        Orchestration d'une application WordPress et d'une base
+        de données MariaDB, avec réseau privé et volumes persistants.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">OBJECTIF</p>
+        <h2>1. Objectif de l'expérimentation</h2>
+      </div>
+
+      <p>
+        Cette expérimentation vise à déployer une application
+        web composée de plusieurs services avec Docker Compose.
+      </p>
+
+      <p>
+        L'architecture repose sur deux conteneurs distincts :
+        WordPress pour l'application web et MariaDB pour
+        le stockage des données.
+      </p>
+
+      <p>
+        Les objectifs sont de vérifier le démarrage coordonné
+        des services, leur communication sur un réseau privé,
+        l'accès web local et la persistance des données
+        après arrêt et redémarrage des conteneurs.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ENVIRONNEMENT</p>
+        <h2>2. Configuration technique</h2>
+      </div>
+
+      <ul>
+        <li>Système hôte : Windows 11 Famille.</li>
+        <li>Terminal : Windows PowerShell 5.1.</li>
+        <li>Plateforme : Docker Desktop avec moteur WSL 2.</li>
+        <li>Docker Compose : version 5.6.1.</li>
+        <li>Base de données : MariaDB 11.4.</li>
+        <li>Application web : WordPress avec PHP 8.3 et Apache.</li>
+        <li>Réseau : bridge privé géré par Docker Compose.</li>
+        <li>Port publié : 127.0.0.1:8081 vers le port 80.</li>
+        <li>Stockage : deux volumes Docker nommés.</li>
+      </ul>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ARCHITECTURE</p>
+        <h2>3. Architecture multi-conteneurs</h2>
+      </div>
+
+      <p>
+        Docker Compose orchestre deux services indépendants
+        reliés au même réseau privé.
+      </p>
+
+      <pre><code>Windows 11
+    |
+    | http://127.0.0.1:8081
+    |
+Docker Desktop / WSL 2
+    |
+    +-- Réseau : experiment-04-compose_lab-network
+          |
+          +-- WordPress
+          |     takoubakoy-wordpress
+          |     PHP 8.3 / Apache
+          |     Port interne : 80
+          |     Volume : wordpress_data
+          |
+          +-- MariaDB
+                takoubakoy-db
+                MariaDB 11.4
+                Port interne : 3306
+                Volume : db_data</code></pre>
+
+      <p>
+        WordPress communique avec MariaDB en utilisant
+        le nom du service database sur le réseau Docker.
+        Le port 3306 n'est pas publié sur l'hôte Windows.
+      </p>
+
+      <p>
+        L'accès web est limité à l'adresse de boucle locale
+        127.0.0.1 sur le port 8081.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">PROCÉDURE</p>
+        <h2>4. Déploiement du laboratoire</h2>
+      </div>
+
+      <h3>4.1 — Vérification de Docker Compose</h3>
+
+      <pre><code>docker compose version</code></pre>
+
+      <p>
+        Résultat observé : Docker Compose version 5.6.1.
+      </p>
+
+      <h3>4.2 — Préparation du dossier</h3>
+
+      <p>
+        Un dossier indépendant a été créé pour isoler
+        cette expérimentation des précédents laboratoires.
+      </p>
+
+      <pre><code>New-Item -ItemType Directory -Force -Path "$HOME\TAKOUBAKOY-LAB\experiment-04-compose"
+
+Set-Location "$HOME\TAKOUBAKOY-LAB\experiment-04-compose"</code></pre>
+
+      <h3>4.3 — Configuration Docker Compose</h3>
+
+      <p>
+        Le fichier compose.yaml définit les deux services,
+        leur réseau privé et leurs volumes persistants.
+      </p>
+
+      <pre><code>services:
+  database:
+    image: mariadb:11.4
+    container_name: takoubakoy-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wpuser
+      MARIADB_PASSWORD: [MOT_DE_PASSE_DE_TEST]
+      MARIADB_ROOT_PASSWORD: [MOT_DE_PASSE_ROOT_DE_TEST]
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - lab-network
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    container_name: takoubakoy-wordpress
+    restart: unless-stopped
+    depends_on:
+      - database
+    ports:
+      - "127.0.0.1:8081:80"
+    environment:
+      WORDPRESS_DB_HOST: database:3306
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: [MOT_DE_PASSE_DE_TEST]
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - lab-network
+
+networks:
+  lab-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  wordpress_data:</code></pre>
+
+      <p>
+        Les mots de passe de laboratoire sont volontairement
+        remplacés par des indications dans ce rapport.
+        Les identifiants réels ne sont pas publiés.
+      </p>
+
+      <h3>4.4 — Validation de la configuration</h3>
+
+      <pre><code>docker compose -f "$HOME\TAKOUBAKOY-LAB\experiment-04-compose\compose.yaml" config</code></pre>
+
+      <p>
+        Résultat : la configuration a été interprétée
+        correctement. Les deux services, le réseau
+        et les volumes ont été reconnus.
+      </p>
+
+      <h3>4.5 — Téléchargement et démarrage</h3>
+
+      <pre><code>docker compose -f "$HOME\TAKOUBAKOY-LAB\experiment-04-compose\compose.yaml" up -d</code></pre>
+
+      <p>
+        Les images mariadb:11.4 et wordpress:php8.3-apache
+        ont été téléchargées. Le réseau et les volumes
+        ont été créés, puis les deux conteneurs démarrés.
+      </p>
+
+      <h3>4.6 — Vérification des services</h3>
+
+      <pre><code>docker compose -f "$HOME\TAKOUBAKOY-LAB\experiment-04-compose\compose.yaml" ps</code></pre>
+
+      <p>
+        Résultat observé : les deux conteneurs sont à l'état Up.
+        WordPress publie le port 8081 sur 127.0.0.1.
+        MariaDB reste accessible uniquement dans le réseau Docker.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">RÉSULTATS</p>
+        <h2>5. Tests et vérifications</h2>
+      </div>
+
+      <h3>Test 1 — Validation de la configuration</h3>
+
+      <p>
+        La commande docker compose config a confirmé
+        la reconnaissance des services database et wordpress,
+        du réseau bridge et des deux volumes.
+      </p>
+
+      <p>Résultat : configuration validée.</p>
+
+      <h3>Test 2 — Démarrage multi-conteneurs</h3>
+
+      <p>
+        Les images ont été téléchargées et les conteneurs
+        takoubakoy-db et takoubakoy-wordpress ont démarré.
+      </p>
+
+      <p>Résultat : démarrage réussi.</p>
+
+      <h3>Test 3 — Communication WordPress et MariaDB</h3>
+
+      <p>
+        L'installation de WordPress a atteint l'écran
+        de sélection de langue, puis le formulaire
+        d'installation initiale.
+      </p>
+
+      <p>
+        L'installation et la création du site ont abouti,
+        ce qui confirme que WordPress a pu communiquer
+        avec sa base de données MariaDB.
+      </p>
+
+      <p>Résultat : communication entre services validée.</p>
+
+      <h3>Test 4 — Accès HTTP local</h3>
+
+      <p>
+        L'adresse http://127.0.0.1:8081 a été ouverte
+        dans Microsoft Edge.
+      </p>
+
+      <p>
+        L'écran d'installation de WordPress s'est affiché,
+        puis le site public et son tableau de bord
+        ont été accessibles.
+      </p>
+
+      <p>Résultat : accès web local validé.</p>
+
+      <h3>Test 5 — Authentification administrateur</h3>
+
+      <p>
+        Le compte labadmin a été créé lors de l'installation.
+        Après une perte du mot de passe initial,
+        l'accès a été rétabli directement dans MariaDB,
+        puis le mot de passe administrateur a été changé
+        depuis l'interface WordPress.
+      </p>
+
+      <p>
+        Résultat : accès administrateur rétabli et sécurisé
+        pour la suite de l'expérimentation.
+      </p>
+
+      <h3>Test 6 — Arrêt contrôlé des services</h3>
+
+      <pre><code>docker compose -f "$HOME\TAKOUBAKOY-LAB\experiment-04-compose\compose.yaml" stop</code></pre>
+
+      <p>
+        Résultat observé : WordPress et MariaDB ont été arrêtés.
+        Les volumes n'ont pas été supprimés.
+      </p>
+
+      <h3>Test 7 — Redémarrage des services</h3>
+
+      <pre><code>docker compose -f "$HOME\TAKOUBAKOY-LAB\experiment-04-compose\compose.yaml" start</code></pre>
+
+      <p>
+        Résultat observé : les deux conteneurs ont redémarré.
+        Leur état Up a été confirmé avec docker compose ps.
+      </p>
+
+      <h3>Test 8 — Vérification de la persistance</h3>
+
+      <p>
+        Après redémarrage, le tableau de bord WordPress
+        était toujours accessible. Le compte labadmin
+        et son nouveau mot de passe fonctionnaient.
+      </p>
+
+      <p>
+        Résultat : persistance de l'installation et
+        des données du compte administrateur validée.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">ANALYSE</p>
+        <h2>6. Observations et limites</h2>
+      </div>
+
+      <ul>
+        <li>
+          Docker Compose simplifie le déploiement coordonné
+          de plusieurs services à partir d'un seul fichier.
+        </li>
+        <li>
+          Le réseau privé permet à WordPress de joindre
+          MariaDB en utilisant le nom du service database.
+        </li>
+        <li>
+          La publication sur 127.0.0.1:8081 limite
+          l'accès web à la machine hôte.
+        </li>
+        <li>
+          Les volumes nommés séparent les données persistantes
+          du cycle de vie des conteneurs.
+        </li>
+        <li>
+          La commande stop conserve les conteneurs et les volumes.
+          La commande start permet de les redémarrer.
+        </li>
+        <li>
+          La directive depends_on ordonne le démarrage
+          des services, mais ne garantit pas à elle seule
+          que MariaDB soit prête à accepter les connexions.
+        </li>
+        <li>
+          Aucun test de sauvegarde et de restauration
+          des volumes, de haute disponibilité ou de charge
+          n'a été réalisé.
+        </li>
+        <li>
+          Les identifiants de test ne doivent pas être
+          réutilisés dans un environnement de production.
+        </li>
+      </ul>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">CONCLUSION</p>
+        <h2>7. Conclusion technique</h2>
+      </div>
+
+      <p>
+        L'expérimentation 04 confirme le fonctionnement
+        d'une application multi-conteneurs orchestrée
+        avec Docker Compose.
+      </p>
+
+      <p>
+        WordPress et MariaDB ont été déployés sur un réseau
+        privé, puis testés à travers l'installation
+        de l'application et l'accès depuis le navigateur.
+      </p>
+
+      <p>
+        L'arrêt et le redémarrage des services ont permis
+        de vérifier que les données associées aux volumes
+        persistants étaient conservées.
+      </p>
+
+      <p>
+        Cette expérimentation constitue une base pratique
+        pour comprendre l'orchestration de services,
+        la séparation entre application et base de données
+        et la gestion du stockage dans une infrastructure
+        conteneurisée.
+      </p>
+
+    </section>
+
+    <section class="content-section">
+
+      <div class="section-heading">
+        <p class="eyebrow">NAVIGATION</p>
+        <h2>Autres travaux du laboratoire</h2>
+      </div>
+
+      <p>
+        <a href="../" class="primary-link">
+          Retour au Laboratoire →
+        </a>
+      </p>
+
+      <p>
+        <a href="diagnostic-systeme.html" class="primary-link">
+          Expérimentation 01 — Diagnostic système →
+        </a>
+      </p>
+
+      <p>
+        <a href="environnement-wsl2-docker.html" class="primary-link">
+          Expérimentation 02 — WSL 2 & Docker →
+        </a>
+      </p>
+
+      <p>
+        <a href="laboratoire-reseau-docker.html" class="primary-link">
+          Expérimentation 03 — Laboratoire réseau Docker →
+        </a>
+      </p>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+
+    <p class="footer-brand">TAKOUBAKOY LAB</p>
+    <p class="footer-tagline">Digital Independence</p>
+
+    <p class="footer-copy">
+      © 2026 TAKOUBAKOY LAB — Tous droits réservés.
+    </p>
+
+  </footer>
+
+</body>
+</html>
